@@ -495,6 +495,46 @@ class ComponentsPage extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 24),
+          Text('Liquid Glass Cards',
+              style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 8),
+          Wrap(spacing: 8, runSpacing: 8, children: [
+            SizedBox(
+              width: 160,
+              child: AppLiquidGlassCard(
+                onTap: () {},
+                child: Column(
+                  children: [
+                    const Icon(Amicons.lucide_droplets, size: 32),
+                    const SizedBox(height: 8),
+                    const Text('Pure Glass',
+                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    const Text('No packages'),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 160,
+              child: AppLiquidGlassCard(
+                onTap: () {},
+                gradientColors: [
+                  Colors.blue.withValues(alpha: 0.3),
+                  Colors.purple.withValues(alpha: 0.1),
+                ],
+                child: Column(
+                  children: [
+                    const Icon(Amicons.lucide_star, size: 32),
+                    const SizedBox(height: 8),
+                    const Text('Custom Tint',
+                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    const Text('Any gradient'),
+                  ],
+                ),
+              ),
+            ),
+          ]),
         ],
       ),
     );
