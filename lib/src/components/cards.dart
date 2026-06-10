@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 /// Design system card component
 class AppCard extends StatelessWidget {
   const AppCard({
-    Key? key,
+    super.key,
     required this.child,
     this.onTap,
     this.elevation,
     this.margin,
     this.padding,
-  }) : super(key: key);
+  });
 
   final Widget child;
   final VoidCallback? onTap;
@@ -19,8 +19,6 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Card(
       elevation: elevation ?? 2,
       margin: margin ?? const EdgeInsets.all(8),

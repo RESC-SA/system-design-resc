@@ -15,3 +15,4 @@ export 'src/tokens/typography.dart';
 // Component exports
 export 'src/components/buttons.dart';
 export 'src/components/cards.dart';
+export 'src/components/scaffolds.dart';
