@@ -23,8 +23,6 @@ class AppColorSchemes {
     
     surface: Color(0xFFFFFFFF),
     onSurface: Color(0xFF1C1B1F),
-    background: Color(0xFFFFFFFF),
-    onBackground: Color(0xFF1C1B1F),
     
     error: Color(0xFFBA1A1A),
     onError: Color(0xFFFFFFFF),
@@ -55,8 +53,6 @@ class AppColorSchemes {
     
     surface: Color(0xFF0F0F0F),
     onSurface: Color(0xFFE6E1E5),
-    background: Color(0xFF0F0F0F),
-    onBackground: Color(0xFFE6E1E5),
     
     error: Color(0xFFFFB4AB),
     onError: Color(0xFF690005),
