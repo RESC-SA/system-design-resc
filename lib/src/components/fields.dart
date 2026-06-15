@@ -854,6 +854,7 @@ class AppTextField extends StatefulWidget {
     TextInputType? keyboardType,
     TextInputAction? textInputAction,
     void Function(String)? onSubmitted,
+    bool obscureText = false,
 
   }) =>
       AppTextField(
@@ -877,6 +878,7 @@ class AppTextField extends StatefulWidget {
         keyboardType: keyboardType,
         textInputAction: textInputAction,
         onSubmitted: onSubmitted,
+        obscureText: obscureText,
       );
 
   @override
