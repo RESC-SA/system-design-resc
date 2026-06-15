@@ -4,6 +4,7 @@ library flutter_design_system;
 
 // Theme exports
 export 'src/theme/app_theme.dart';
+export 'src/theme/app_theme_builder.dart';
 export 'src/theme/color_schemes.dart';
 export 'src/theme/text_theme.dart';
 export 'src/theme/solar_theme_extension.dart';
@@ -24,3 +25,6 @@ export 'src/components/lists.dart';
 export 'src/components/scaffolds.dart';
 export 'src/components/text.dart';
 export 'src/components/text_direction_extension.dart';
+
+// Routing
+export 'src/routing/app_router.dart';
