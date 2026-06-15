@@ -16,7 +16,7 @@ export 'src/tokens/spacing.dart';
 export 'src/tokens/typography.dart';
 
 // Component exports
-export 'src/components/buttons.dart';
+export 'src/components/buttons-icon.dart';
 export 'src/components/containers.dart';
 export 'src/components/fields.dart';
 export 'src/components/glass_container.dart';
@@ -25,6 +25,8 @@ export 'src/components/lists.dart';
 export 'src/components/scaffolds.dart';
 export 'src/components/text.dart';
 export 'src/components/text_direction_extension.dart';
-
+export 'src/components/sample/cards-sample.dart';
+export 'src/components/sample/scaffolds-sample.dart';
+export 'src/components/buttons-sample.dart' hide AppIconButton;
 // Routing
 export 'src/routing/app_router.dart';

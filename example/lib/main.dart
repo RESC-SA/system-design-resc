@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:amicons/amicons.dart';
 
 import '../../lib/flutter_design_system.dart';
-import '../../lib/src/components/sample/buttons.dart' as sample;
-import '../../lib/src/components/sample/cards.dart';
-import '../../lib/src/components/sample/scaffolds.dart';
+import '../../lib/src/components/buttons-sample.dart' as sample;
 
 void main() {
   runApp(const DesignSystemExampleApp());
