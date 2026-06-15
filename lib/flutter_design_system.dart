@@ -7,7 +7,7 @@ export 'src/theme/app_theme.dart';
 export 'src/theme/app_theme_builder.dart';
 export 'src/theme/color_schemes.dart';
 export 'src/theme/text_theme.dart';
-export 'src/theme/solar_theme_extension.dart';
+export 'src/theme/app_theme_extension.dart';
 export 'src/theme/theme_extensions.dart';
 
 // Token exports
