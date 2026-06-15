@@ -8,7 +8,7 @@
 library system_design_widgets;
 
 export 'text.dart';
-export 'buttons.dart';
+export 'buttons-icon.dart';
 export 'fields.dart';
 export 'containers.dart';
 export 'scaffolds.dart';

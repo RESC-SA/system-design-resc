@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 
 /// Design system button component
 class AppButton extends StatelessWidget {
+  final VoidCallback? onPressed;
+
+  final Widget child;
+  final AppButtonVariant variant;
+  final IconData? icon;
+  final IconPosition iconPosition;
+  final AppButtonSize size;
+  final bool expanded;
   const AppButton({
     super.key,
     required this.onPressed,
@@ -13,13 +21,27 @@ class AppButton extends StatelessWidget {
     this.expanded = false,
   });
 
-  final VoidCallback? onPressed;
-  final Widget child;
-  final AppButtonVariant variant;
-  final IconData? icon;
-  final IconPosition iconPosition;
-  final AppButtonSize size;
-  final bool expanded;
+  double get _iconSize {
+    switch (size) {
+      case AppButtonSize.sm:
+        return 16;
+      case AppButtonSize.md:
+        return 20;
+      case AppButtonSize.lg:
+        return 24;
+    }
+  }
+
+  EdgeInsets get _padding {
+    switch (size) {
+      case AppButtonSize.sm:
+        return const EdgeInsets.symmetric(horizontal: 16, vertical: 8);
+      case AppButtonSize.md:
+        return const EdgeInsets.symmetric(horizontal: 24, vertical: 12);
+      case AppButtonSize.lg:
+        return const EdgeInsets.symmetric(horizontal: 32, vertical: 16);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,17 +74,6 @@ class AppButton extends StatelessWidget {
         ],
       ],
     );
-  }
-
-  double get _iconSize {
-    switch (size) {
-      case AppButtonSize.sm:
-        return 16;
-      case AppButtonSize.md:
-        return 20;
-      case AppButtonSize.lg:
-        return 24;
-    }
   }
 
   ButtonStyle _getStyle(ColorScheme colors) {
@@ -103,27 +114,19 @@ class AppButton extends StatelessWidget {
         );
     }
   }
-
-  EdgeInsets get _padding {
-    switch (size) {
-      case AppButtonSize.sm:
-        return const EdgeInsets.symmetric(horizontal: 16, vertical: 8);
-      case AppButtonSize.md:
-        return const EdgeInsets.symmetric(horizontal: 24, vertical: 12);
-      case AppButtonSize.lg:
-        return const EdgeInsets.symmetric(horizontal: 32, vertical: 16);
-    }
-  }
 }
-
-enum AppButtonVariant { primary, secondary, outlined, text, tonal }
 
 enum AppButtonSize { sm, md, lg }
 
-enum IconPosition { start, end }
+enum AppButtonVariant { primary, secondary, outlined, text, tonal }
 
 /// Icon-only button
 class AppIconButton extends StatelessWidget {
+  final VoidCallback? onPressed;
+
+  final IconData icon;
+  final AppButtonSize size;
+  final AppButtonVariant variant;
   const AppIconButton({
     super.key,
     required this.onPressed,
@@ -131,11 +134,6 @@ class AppIconButton extends StatelessWidget {
     this.size = AppButtonSize.md,
     this.variant = AppButtonVariant.primary,
   });
-
-  final VoidCallback? onPressed;
-  final IconData icon;
-  final AppButtonSize size;
-  final AppButtonVariant variant;
 
   @override
   Widget build(BuildContext context) {
@@ -192,3 +190,5 @@ class AppIconButton extends StatelessWidget {
     }
   }
 }
+
+enum IconPosition { start, end }
