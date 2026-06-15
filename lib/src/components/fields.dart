@@ -852,6 +852,9 @@ class AppTextField extends StatefulWidget {
     FormFieldValidator<String>? validator,
     bool enabled = true,
     TextInputType? keyboardType,
+    TextInputAction? textInputAction,
+    void Function(String)? onSubmitted,
+
   }) =>
       AppTextField(
         key: key,
@@ -872,6 +875,8 @@ class AppTextField extends StatefulWidget {
         validator: validator,
         enabled: enabled,
         keyboardType: keyboardType,
+        textInputAction: textInputAction,
+        onSubmitted: onSubmitted,
       );
 
   @override
