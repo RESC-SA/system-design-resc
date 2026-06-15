@@ -1,11 +1,133 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-import '../theme/solar_theme_extension.dart';
+import '../theme/app_theme_extension.dart';
 import '../theme/theme_extensions.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AppLinearProgress
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Notification dot / count badge overlaid on any child widget.
+/// Pass `count: null` for a plain dot indicator.
+class AppBadge extends StatelessWidget {
+  final Widget child;
+  final int? count;
+  final bool visible;
+  final Color? color;
+
+  const AppBadge({
+    super.key,
+    required this.child,
+    this.count,
+    this.visible = true,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final badgeColor = color ?? colors.neonRed;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        child,
+        if (visible)
+          PositionedDirectional(
+            top: -4,
+            end: -4,
+            child: Container(
+              constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+              padding: count != null
+                  ? const EdgeInsets.symmetric(horizontal: 5, vertical: 1)
+                  : const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: badgeColor,
+                shape: count != null ? BoxShape.rectangle : BoxShape.circle,
+                borderRadius: count != null ? BorderRadius.circular(8) : null,
+              ),
+              child: count != null
+                  ? Text(
+                      count! > 99 ? '99+' : '$count',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  : null,
+            ).animate().scale(
+                  duration: 200.ms,
+                  curve: Curves.elasticOut,
+                  begin: const Offset(0, 0),
+                  end: const Offset(1, 1),
+                ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Themed circular progress indicator.
+/// Determinate variant shows value overlay; indeterminate for loading.
+class AppCircularProgress extends StatelessWidget {
+  final double? value; // null = indeterminate
+  final String? label;
+  final Color? color;
+  final double size;
+  final double strokeWidth;
+
+  const AppCircularProgress({
+    super.key,
+    this.value,
+    this.label,
+    this.color,
+    this.size = 48,
+    this.strokeWidth = 4,
+  });
+
+  factory AppCircularProgress.indeterminate({
+    Color? color,
+    double size = 48,
+  }) =>
+      AppCircularProgress(value: null, color: color, size: size);
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final effectiveColor = color ?? colors.primary;
+
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          CircularProgressIndicator(
+            value: value,
+            color: effectiveColor,
+            backgroundColor: colors.border.withValues(alpha: 0.3),
+            strokeWidth: strokeWidth,
+            strokeCap: StrokeCap.round,
+          ),
+          if (label != null)
+            Text(
+              label!,
+              style: TextStyle(
+                color: effectiveColor,
+                fontSize: size * 0.22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AppCircularProgress
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// Themed horizontal progress bar using neon color tokens.
@@ -132,253 +254,6 @@ class AppLinearProgress extends StatelessWidget {
   }
 }
 
-class _BatteryProgress extends AppLinearProgress {
-  const _BatteryProgress({required super.value, super.label});
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final clampedValue = value.clamp(0.0, 1.0);
-    final effectiveColor = clampedValue < 0.2
-        ? colors.neonRed
-        : clampedValue < 0.4
-            ? colors.neonOrange
-            : colors.neonGreen;
-
-    return AppLinearProgress(
-      value: value,
-      label: label,
-      trailingLabel: '${(clampedValue * 100).toInt()}%',
-      color: effectiveColor,
-      height: 10,
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// AppCircularProgress
-// ─────────────────────────────────────────────────────────────────────────────
-
-/// Themed circular progress indicator.
-/// Determinate variant shows value overlay; indeterminate for loading.
-class AppCircularProgress extends StatelessWidget {
-  final double? value; // null = indeterminate
-  final String? label;
-  final Color? color;
-  final double size;
-  final double strokeWidth;
-
-  const AppCircularProgress({
-    super.key,
-    this.value,
-    this.label,
-    this.color,
-    this.size = 48,
-    this.strokeWidth = 4,
-  });
-
-  factory AppCircularProgress.indeterminate({
-    Color? color,
-    double size = 48,
-  }) =>
-      AppCircularProgress(value: null, color: color, size: size);
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final effectiveColor = color ?? colors.primary;
-
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          CircularProgressIndicator(
-            value: value,
-            color: effectiveColor,
-            backgroundColor: colors.border.withValues(alpha: 0.3),
-            strokeWidth: strokeWidth,
-            strokeCap: StrokeCap.round,
-          ),
-          if (label != null)
-            Text(
-              label!,
-              style: TextStyle(
-                color: effectiveColor,
-                fontSize: size * 0.22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// AppStatusChip
-// ─────────────────────────────────────────────────────────────────────────────
-
-enum AppStatusChipColor { green, red, orange, blue, purple, dim }
-
-/// Small colored chip for live inverter / BLE status display.
-/// Color variants map directly to neon tokens.
-class AppStatusChip extends StatelessWidget {
-  final String label;
-  final AppStatusChipColor chipColor;
-  final IconData? icon;
-  final bool compact;
-
-  const AppStatusChip({
-    super.key,
-    required this.label,
-    this.chipColor = AppStatusChipColor.green,
-    this.icon,
-    this.compact = false,
-  });
-
-  factory AppStatusChip.connected(String label) => AppStatusChip(
-        label: label,
-        chipColor: AppStatusChipColor.green,
-        icon: Icons.bluetooth_connected,
-      );
-
-  factory AppStatusChip.disconnected(String label) => AppStatusChip(
-        label: label,
-        chipColor: AppStatusChipColor.dim,
-        icon: Icons.bluetooth_disabled,
-      );
-
-  factory AppStatusChip.fault(String label) => AppStatusChip(
-        label: label,
-        chipColor: AppStatusChipColor.red,
-        icon: Icons.error_outline,
-      );
-
-  Color _resolveColor(SolarThemeExtension colors) {
-    switch (chipColor) {
-      case AppStatusChipColor.green:
-        return colors.neonGreen;
-      case AppStatusChipColor.red:
-        return colors.neonRed;
-      case AppStatusChipColor.orange:
-        return colors.neonOrange;
-      case AppStatusChipColor.blue:
-        return colors.neonBlue;
-      case AppStatusChipColor.purple:
-        return colors.neonPurple;
-      case AppStatusChipColor.dim:
-        return colors.textDim;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final color = _resolveColor(colors);
-    final hPad = compact ? 8.0 : 10.0;
-    final vPad = compact ? 3.0 : 5.0;
-    final fontSize = compact ? 11.0 : 12.0;
-
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.13),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.35), width: 1),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: compact ? 11 : 13, color: color),
-            SizedBox(width: compact ? 4 : 5),
-          ],
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: fontSize,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.2,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// AppBadge
-// ─────────────────────────────────────────────────────────────────────────────
-
-/// Notification dot / count badge overlaid on any child widget.
-/// Pass `count: null` for a plain dot indicator.
-class AppBadge extends StatelessWidget {
-  final Widget child;
-  final int? count;
-  final bool visible;
-  final Color? color;
-
-  const AppBadge({
-    super.key,
-    required this.child,
-    this.count,
-    this.visible = true,
-    this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final badgeColor = color ?? colors.neonRed;
-
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        child,
-        if (visible)
-          PositionedDirectional(
-            top: -4,
-            end: -4,
-            child: Container(
-              constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-              padding: count != null
-                  ? const EdgeInsets.symmetric(horizontal: 5, vertical: 1)
-                  : const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: badgeColor,
-                shape: count != null ? BoxShape.rectangle : BoxShape.circle,
-                borderRadius: count != null ? BorderRadius.circular(8) : null,
-              ),
-              child: count != null
-                  ? Text(
-                      count! > 99 ? '99+' : '$count',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )
-                  : null,
-            ).animate().scale(
-                  duration: 200.ms,
-                  curve: Curves.elasticOut,
-                  begin: const Offset(0, 0),
-                  end: const Offset(1, 1),
-                ),
-          ),
-      ],
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// AppPulseDot
-// ─────────────────────────────────────────────────────────────────────────────
-
 /// Animated pulsing dot — indicates live BLE streaming data or active monitoring.
 /// Color maps to neon tokens: green = live, red = fault, orange = warning.
 class AppPulseDot extends StatelessWidget {
@@ -393,10 +268,9 @@ class AppPulseDot extends StatelessWidget {
     this.active = true,
   });
 
-  factory AppPulseDot.live({double size = 10}) => AppPulseDot(size: size);
+  factory AppPulseDot.fault({double size = 10}) => _FaultPulseDot(size: size);
 
-  factory AppPulseDot.fault({double size = 10}) =>
-      _FaultPulseDot(size: size);
+  factory AppPulseDot.live({double size = 10}) => AppPulseDot(size: size);
 
   factory AppPulseDot.warning({double size = 10}) =>
       _WarningPulseDot(size: size);
@@ -458,24 +332,106 @@ class AppPulseDot extends StatelessWidget {
   }
 }
 
-class _FaultPulseDot extends AppPulseDot {
-  const _FaultPulseDot({super.size});
+/// Small colored chip for live inverter / BLE status display.
+/// Color variants map directly to neon tokens.
+class AppStatusChip extends StatelessWidget {
+  final String label;
+  final AppStatusChipColor chipColor;
+  final IconData? icon;
+  final bool compact;
+
+  const AppStatusChip({
+    super.key,
+    required this.label,
+    this.chipColor = AppStatusChipColor.green,
+    this.icon,
+    this.compact = false,
+  });
+
+  factory AppStatusChip.connected(String label) => AppStatusChip(
+        label: label,
+        chipColor: AppStatusChipColor.green,
+        icon: Icons.bluetooth_connected,
+      );
+
+  factory AppStatusChip.disconnected(String label) => AppStatusChip(
+        label: label,
+        chipColor: AppStatusChipColor.dim,
+        icon: Icons.bluetooth_disabled,
+      );
+
+  factory AppStatusChip.fault(String label) => AppStatusChip(
+        label: label,
+        chipColor: AppStatusChipColor.red,
+        icon: Icons.error_outline,
+      );
 
   @override
-  Widget build(BuildContext context) =>
-      AppPulseDot(color: context.colors.neonRed, size: size);
-}
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final color = _resolveColor(colors);
+    final hPad = compact ? 8.0 : 10.0;
+    final vPad = compact ? 3.0 : 5.0;
+    final fontSize = compact ? 11.0 : 12.0;
 
-class _WarningPulseDot extends AppPulseDot {
-  const _WarningPulseDot({super.size});
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.13),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.35), width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: compact ? 11 : 13, color: color),
+            SizedBox(width: compact ? 4 : 5),
+          ],
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: fontSize,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) =>
-      AppPulseDot(color: context.colors.neonOrange, size: size);
+  Color _resolveColor(AppThemeExtension colors) {
+    switch (chipColor) {
+      case AppStatusChipColor.green:
+        return colors.neonGreen;
+      case AppStatusChipColor.red:
+        return colors.neonRed;
+      case AppStatusChipColor.orange:
+        return colors.neonOrange;
+      case AppStatusChipColor.blue:
+        return colors.neonBlue;
+      case AppStatusChipColor.purple:
+        return colors.neonPurple;
+      case AppStatusChipColor.dim:
+        return colors.textDim;
+    }
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AppValueIndicator
+// AppBadge
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AppStatusChip
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum AppStatusChipColor { green, red, orange, blue, purple, dim }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AppPulseDot
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// Labeled value row: "Voltage · 220 V" with color-coded neon value.
@@ -506,8 +462,8 @@ class AppValueIndicator extends StatelessWidget {
     final effectiveValueColor = valueColor ?? colors.neonCyan;
 
     return Container(
-      padding: const EdgeInsetsDirectional.symmetric(
-          horizontal: 14, vertical: 12),
+      padding:
+          const EdgeInsetsDirectional.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: highlight
             ? effectiveValueColor.withValues(alpha: 0.07)
@@ -567,4 +523,47 @@ class AppValueIndicator extends StatelessWidget {
       ),
     );
   }
+}
+
+class _BatteryProgress extends AppLinearProgress {
+  const _BatteryProgress({required super.value, super.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final clampedValue = value.clamp(0.0, 1.0);
+    final effectiveColor = clampedValue < 0.2
+        ? colors.neonRed
+        : clampedValue < 0.4
+            ? colors.neonOrange
+            : colors.neonGreen;
+
+    return AppLinearProgress(
+      value: value,
+      label: label,
+      trailingLabel: '${(clampedValue * 100).toInt()}%',
+      color: effectiveColor,
+      height: 10,
+    );
+  }
+}
+
+class _FaultPulseDot extends AppPulseDot {
+  const _FaultPulseDot({super.size});
+
+  @override
+  Widget build(BuildContext context) =>
+      AppPulseDot(color: context.colors.neonRed, size: size);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AppValueIndicator
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _WarningPulseDot extends AppPulseDot {
+  const _WarningPulseDot({super.size});
+
+  @override
+  Widget build(BuildContext context) =>
+      AppPulseDot(color: context.colors.neonOrange, size: size);
 }
