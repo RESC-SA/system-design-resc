@@ -1,244 +1,396 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
-/// Page scaffold with a sliver app bar
-class AppSliverScaffold extends StatelessWidget {
-  const AppSliverScaffold({
+import '../theme/theme_extensions.dart';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AppScaffold
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Opinionated app-wide scaffold with:
+/// - SafeArea applied
+/// - Themed AppBar (title, optional back button, optional actions)
+/// - `scaffoldBg` background color from theme extension
+/// - Optional floating action button slot
+/// - Optional bottom navigation bar slot
+class AppScaffold extends StatelessWidget {
+  final String? title;
+  final Widget body;
+  final List<Widget>? actions;
+  final Widget? floatingActionButton;
+  final Widget? bottomNavigationBar;
+  final Widget? bottomSheet;
+  final bool showBackButton;
+  final VoidCallback? onBack;
+  final PreferredSizeWidget? customAppBar;
+  final bool resizeToAvoidBottomInset;
+  final Color? backgroundColor;
+  final Widget? leading;
+
+  const AppScaffold({
     super.key,
     this.title,
+    required this.body,
     this.actions,
-    this.leading,
-    this.body,
-    this.slivers,
-    this.bottom,
-    this. floating,
-    this.pinned = true,
-    this.snap = false,
-    this. expandedHeight,
-    this. flexibleSpace,
+    this.floatingActionButton,
+    this.bottomNavigationBar,
+    this.bottomSheet,
+    this.showBackButton = true,
+    this.onBack,
+    this.customAppBar,
+    this.resizeToAvoidBottomInset = true,
     this.backgroundColor,
-    this. bottomNavigationBar,
-    this. drawer,
-    this. endDrawer,
-    this. resizeToAvoidBottomInset = true,
+    this.leading,
   });
-
-  final Widget? title;
-  final List<Widget>? actions;
-  final Widget? leading;
-  final Widget? body;
-  final List<Widget>? slivers;
-  final PreferredSizeWidget? bottom;
-  final bool? floating;
-  final bool pinned;
-  final bool snap;
-  final double? expandedHeight;
-  final Widget? flexibleSpace;
-  final Color? backgroundColor;
-  final Widget? bottomNavigationBar;
-  final Widget? drawer;
-  final Widget? endDrawer;
-  final bool resizeToAvoidBottomInset;
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
+    final colors = context.colors;
+    final canPop = Navigator.of(context).canPop();
 
     return Scaffold(
-      backgroundColor: backgroundColor,
-      bottomNavigationBar: bottomNavigationBar,
-      drawer: drawer,
-      endDrawer: endDrawer,
+      backgroundColor: backgroundColor ?? context.scaffoldBg,
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            title: title,
-            actions: actions,
-            leading: leading,
-            bottom: bottom,
-            floating: floating ?? false,
-            pinned: pinned,
-            snap: snap,
-            expandedHeight: expandedHeight,
-            flexibleSpace: flexibleSpace,
-            backgroundColor: backgroundColor ?? colors.surface,
-            foregroundColor: colors.onSurface,
-          ),
-          if (body != null)
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: body!,
+      appBar: customAppBar ??
+          (title != null
+              ? AppBar(
+                  backgroundColor: context.scaffoldBg,
+                  surfaceTintColor: Colors.transparent,
+                  scrolledUnderElevation: 0,
+                  elevation: 0,
+                  centerTitle: true,
+                  title: Text(
+                    title!,
+                    style: TextStyle(
+                      color: colors.textPrimary,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  leading: leading ??
+                      (showBackButton && canPop
+                          ? IconButton(
+                              icon: Icon(
+                                Icons.arrow_back_ios_new,
+                                color: colors.textPrimary,
+                                size: 20,
+                              ),
+                              onPressed: onBack ?? () => Navigator.of(context).pop(),
+                            )
+                          : null),
+                  actions: actions,
+                )
+              : null),
+      body: SafeArea(child: body),
+      floatingActionButton: floatingActionButton,
+      bottomNavigationBar: bottomNavigationBar,
+      bottomSheet: bottomSheet,
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AppBottomSheetHelper
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Static helper to show a consistently themed modal bottom sheet.
+///
+/// ```dart
+/// AppBottomSheetHelper.show(
+///   context,
+///   title: 'Select Protocol',
+///   child: ProtocolPicker(),
+/// );
+/// ```
+class AppBottomSheetHelper {
+  const AppBottomSheetHelper._();
+
+  static Future<T?> show<T>(
+    BuildContext context, {
+    required Widget child,
+    String? title,
+    bool isDismissible = true,
+    bool isScrollControlled = true,
+    double? maxHeightFraction,
+  }) {
+    final colors = context.colors;
+    return showModalBottomSheet<T>(
+      context: context,
+      isDismissible: isDismissible,
+      isScrollControlled: isScrollControlled,
+      backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      builder: (ctx) {
+        final Widget sheet = Container(
+          constraints: maxHeightFraction != null
+              ? BoxConstraints(
+                  maxHeight:
+                      MediaQuery.of(ctx).size.height * maxHeightFraction,
+                )
+              : const BoxConstraints(),
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(24),
             ),
-          if (slivers != null) ...slivers!,
+            border: Border(
+              top: BorderSide(color: colors.border, width: 0.8),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Drag handle
+              Padding(
+                padding: const EdgeInsets.only(top: 12, bottom: 4),
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colors.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              if (title != null) ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      color: colors.textPrimary,
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+              Flexible(child: child),
+              SizedBox(
+                height: MediaQuery.of(ctx).viewInsets.bottom,
+              ),
+            ],
+          ),
+        );
+
+        return sheet
+            .animate()
+            .slideY(
+              begin: 0.15,
+              end: 0,
+              duration: 280.ms,
+              curve: Curves.easeOut,
+            )
+            .fadeIn(duration: 200.ms);
+      },
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AppDialogHelper
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Static helper to show a themed AlertDialog with typed action buttons.
+///
+/// ```dart
+/// final confirmed = await AppDialogHelper.confirm(
+///   context,
+///   title: 'Disconnect Device?',
+///   message: 'All live data will stop.',
+/// );
+/// ```
+class AppDialogHelper {
+  const AppDialogHelper._();
+
+  static Future<bool?> confirm(
+    BuildContext context, {
+    required String title,
+    required String message,
+    String confirmLabel = 'Confirm',
+    String cancelLabel = 'Cancel',
+    bool isDanger = false,
+  }) {
+    final colors = context.colors;
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: colors.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: colors.border, width: 0.8),
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: colors.textPrimary,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        content: Text(
+          message,
+          style: TextStyle(color: colors.textSecondary, fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(
+              cancelLabel,
+              style: TextStyle(color: colors.textSecondary),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+                  isDanger ? colors.neonRed : colors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              confirmLabel,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Future<void> info(
+    BuildContext context, {
+    required String title,
+    required String message,
+    String closeLabel = 'OK',
+  }) {
+    final colors = context.colors;
+    return showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: colors.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: colors.border, width: 0.8),
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: colors.textPrimary,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        content: Text(
+          message,
+          style: TextStyle(color: colors.textSecondary, fontSize: 14),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              closeLabel,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-/// Scaffold with bottom navigation tabs
-class AppTabScaffold extends StatelessWidget {
-  const AppTabScaffold({
-    super.key,
-    required this.tabs,
-    required this. tabViews,
-    this. initialIndex = 0,
-    this. title,
-    this. actions,
-    this. appBarBottom,
-    this. floatingActionButton,
-    this. drawer,
-    this. endDrawer,
-    this. bottomBar,
-    this. onTabChanged,
-    this. backgroundColor,
-  });
+// ─────────────────────────────────────────────────────────────────────────────
+// AppSnackBarHelper
+// ─────────────────────────────────────────────────────────────────────────────
 
-  final List<Tab> tabs;
-  final List<Widget> tabViews;
-  final int initialIndex;
-  final Widget? title;
-  final List<Widget>? actions;
-  final PreferredSizeWidget? appBarBottom;
-  final Widget? floatingActionButton;
-  final Widget? drawer;
-  final Widget? endDrawer;
-  final Widget? bottomBar;
-  final ValueChanged<int>? onTabChanged;
-  final Color? backgroundColor;
+/// Static helpers for consistently themed SnackBars.
+/// Variants: success, error, info, warning.
+///
+/// ```dart
+/// AppSnackBarHelper.success(context, 'Register updated successfully');
+/// AppSnackBarHelper.error(context, 'Connection lost');
+/// ```
+class AppSnackBarHelper {
+  const AppSnackBarHelper._();
 
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      initialIndex: initialIndex,
-      length: tabs.length,
-      child: Builder(
-        builder: (context) {
-          final controller = DefaultTabController.of(context);
-          controller.addListener(() {
-            onTabChanged?.call(controller.index);
-          });
+  static void success(BuildContext context, String message) =>
+      _show(context, message, _SnackType.success);
 
-          return Scaffold(
-            backgroundColor: backgroundColor,
-            appBar: AppBar(
-              title: title,
-              actions: actions,
-              bottom: appBarBottom ?? TabBar(tabs: tabs),
-            ),
-            body: TabBarView(children: tabViews),
-            floatingActionButton: floatingActionButton,
-            drawer: drawer,
-            endDrawer: endDrawer,
-            bottomNavigationBar: bottomBar,
-          );
-        },
-      ),
-    );
-  }
-}
+  static void error(BuildContext context, String message) =>
+      _show(context, message, _SnackType.error);
 
-/// Scaffold with nested scroll: sliver app bar + tabs + scrollable content
-class AppNestedScrollScaffold extends StatefulWidget {
-  const AppNestedScrollScaffold({
-    super.key,
-    required this.tabs,
-    required this. tabViews,
-    this. title,
-    this. actions,
-    this. headerSlivers,
-    this. initialIndex = 0,
-    this. expandedHeight = 200,
-    this. flexibleBackground,
-    this. pinned = true,
-    this. floating = false,
-    this. bottomNavigationBar,
-    this. drawer,
-    this. endDrawer,
-    this. backgroundColor,
-    this. onTabChanged,
-  });
+  static void info(BuildContext context, String message) =>
+      _show(context, message, _SnackType.info);
 
-  final List<Tab> tabs;
-  final List<Widget> tabViews;
-  final Widget? title;
-  final List<Widget>? actions;
-  final List<Widget>? headerSlivers;
-  final int initialIndex;
-  final double expandedHeight;
-  final Widget? flexibleBackground;
-  final bool pinned;
-  final bool floating;
-  final Widget? bottomNavigationBar;
-  final Widget? drawer;
-  final Widget? endDrawer;
-  final Color? backgroundColor;
-  final ValueChanged<int>? onTabChanged;
+  static void warning(BuildContext context, String message) =>
+      _show(context, message, _SnackType.warning);
 
-  @override
-  State<AppNestedScrollScaffold> createState() => _AppNestedScrollScaffoldState();
-}
+  static void _show(BuildContext context, String message, _SnackType type) {
+    final colors = context.colors;
+    Color barColor;
+    IconData icon;
 
-class _AppNestedScrollScaffoldState extends State<AppNestedScrollScaffold>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+    switch (type) {
+      case _SnackType.success:
+        barColor = colors.neonGreen;
+        icon = Icons.check_circle_outline;
+        break;
+      case _SnackType.error:
+        barColor = colors.neonRed;
+        icon = Icons.error_outline;
+        break;
+      case _SnackType.warning:
+        barColor = colors.neonOrange;
+        icon = Icons.warning_amber_rounded;
+        break;
+      case _SnackType.info:
+        barColor = colors.neonBlue;
+        icon = Icons.info_outline;
+    }
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(
-      length: widget.tabs.length,
-      vsync: this,
-      initialIndex: widget.initialIndex,
-    );
-    _tabController.addListener(() {
-      if (!_tabController.indexIsChanging) {
-        widget.onTabChanged?.call(_tabController.index);
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-      backgroundColor: widget.backgroundColor,
-      drawer: widget.drawer,
-      endDrawer: widget.endDrawer,
-      bottomNavigationBar: widget.bottomNavigationBar,
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            SliverAppBar(
-              title: widget.title,
-              actions: widget.actions,
-              pinned: widget.pinned,
-              floating: widget.floating,
-              expandedHeight: widget.expandedHeight,
-              flexibleSpace: widget.flexibleBackground != null
-                  ? FlexibleSpaceBar(
-                      background: widget.flexibleBackground!,
-                    )
-                  : null,
-              bottom: TabBar(
-                controller: _tabController,
-                tabs: widget.tabs,
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          backgroundColor: colors.surface2,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: barColor.withValues(alpha: 0.5)),
+          ),
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+          content: Row(
+            children: [
+              Icon(icon, color: barColor, size: 20),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  message,
+                  style: TextStyle(
+                    color: colors.textPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
-            ),
-            if (widget.headerSlivers != null) ...widget.headerSlivers!,
-          ];
-        },
-        body: TabBarView(
-          controller: _tabController,
-          children: widget.tabViews,
+            ],
+          ),
+          duration: const Duration(seconds: 3),
         ),
-      ),
-    );
+      );
   }
 }
+
+enum _SnackType { success, error, info, warning }

@@ -4,8 +4,11 @@ library flutter_design_system;
 
 // Theme exports
 export 'src/theme/app_theme.dart';
+export 'src/theme/app_theme_builder.dart';
 export 'src/theme/color_schemes.dart';
 export 'src/theme/text_theme.dart';
+export 'src/theme/solar_theme_extension.dart';
+export 'src/theme/theme_extensions.dart';
 
 // Token exports
 export 'src/tokens/colors.dart';
@@ -14,5 +17,14 @@ export 'src/tokens/typography.dart';
 
 // Component exports
 export 'src/components/buttons.dart';
-export 'src/components/cards.dart';
+export 'src/components/containers.dart';
+export 'src/components/fields.dart';
+export 'src/components/glass_container.dart';
+export 'src/components/indicators.dart';
+export 'src/components/lists.dart';
 export 'src/components/scaffolds.dart';
+export 'src/components/text.dart';
+export 'src/components/text_direction_extension.dart';
+
+// Routing
+export 'src/routing/app_router.dart';
