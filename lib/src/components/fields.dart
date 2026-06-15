@@ -711,6 +711,103 @@ class AppTextField extends StatefulWidget {
         autofocus: autofocus,
       );
 
+  /// Phone / mobile number field with phone icon and phone validator.
+  factory AppTextField.phone({
+    Key? key,
+    TextEditingController? controller,
+    ValueChanged<String>? onChanged,
+    ValueChanged<String>? onSubmitted,
+    FormFieldValidator<String>? validator,
+    bool enabled = true,
+    String? label,
+  }) =>
+      AppTextField(
+        key: key,
+        controller: controller,
+        label: label ?? 'Phone',
+        hint: 'Enter your phone number',
+        keyboardType: TextInputType.phone,
+        textInputAction: TextInputAction.next,
+        prefixIcon: const Icon(Icons.phone_outlined),
+        validator: validator ?? AppValidators.phone,
+        onChanged: onChanged,
+        onSubmitted: onSubmitted,
+        enabled: enabled,
+      );
+
+  /// Username field with person icon, no spaces, lowercase.
+  factory AppTextField.username({
+    Key? key,
+    TextEditingController? controller,
+    ValueChanged<String>? onChanged,
+    ValueChanged<String>? onSubmitted,
+    FormFieldValidator<String>? validator,
+    bool enabled = true,
+    String? label,
+  }) =>
+      AppTextField(
+        key: key,
+        controller: controller,
+        label: label ?? 'Username',
+        hint: 'Enter your username',
+        keyboardType: TextInputType.text,
+        textInputAction: TextInputAction.next,
+        prefixIcon: const Icon(Icons.person_outlined),
+        validator: validator ?? AppValidators.minLength(3),
+        onChanged: onChanged,
+        onSubmitted: onSubmitted,
+        enabled: enabled,
+      );
+
+  /// Full name field with user icon.
+  factory AppTextField.name({
+    Key? key,
+    TextEditingController? controller,
+    ValueChanged<String>? onChanged,
+    ValueChanged<String>? onSubmitted,
+    FormFieldValidator<String>? validator,
+    bool enabled = true,
+    String? label,
+  }) =>
+      AppTextField(
+        key: key,
+        controller: controller,
+        label: label ?? 'Full Name',
+        hint: 'Enter your full name',
+        keyboardType: TextInputType.name,
+        textInputAction: TextInputAction.next,
+        prefixIcon: const Icon(Icons.badge_outlined),
+        validator: validator ?? AppValidators.required,
+        onChanged: onChanged,
+        onSubmitted: onSubmitted,
+        enabled: enabled,
+      );
+
+  /// Multiline text area — for notes, descriptions, comments.
+  factory AppTextField.multiline({
+    Key? key,
+    TextEditingController? controller,
+    ValueChanged<String>? onChanged,
+    FormFieldValidator<String>? validator,
+    bool enabled = true,
+    String? label,
+    String? hint,
+    int? maxLines,
+    int? minLines,
+  }) =>
+      AppTextField(
+        key: key,
+        controller: controller,
+        label: label ?? 'Notes',
+        hint: hint ?? 'Enter your text',
+        maxLines: maxLines ?? 4,
+        minLines: minLines ?? 3,
+        textInputAction: TextInputAction.newline,
+        onChanged: onChanged,
+        validator: validator,
+        enabled: enabled,
+      );
+
   /// Compact size field — for codes, OTPs, short inputs.
   factory AppTextField.small({
     Key? key,
