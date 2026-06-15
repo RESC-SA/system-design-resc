@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:amicons/amicons.dart';
+
 import '../../lib/flutter_design_system.dart';
+import '../../lib/src/components/sample/buttons.dart' as sample;
+import '../../lib/src/components/sample/cards.dart';
+import '../../lib/src/components/sample/scaffolds.dart';
 
 void main() {
   runApp(const DesignSystemExampleApp());
@@ -146,9 +150,9 @@ class SliverDemoPage extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 24),
-                AppButton(
+                sample.AppButton(
                   onPressed: () {},
-                  variant: AppButtonVariant.tonal,
+                  variant: sample.AppButtonVariant.tonal,
                   icon: Amicons.lucide_arrow_left,
                   child: const Text('Go Back'),
                 ),
@@ -324,9 +328,9 @@ class NestedScrollDemoPage extends StatelessWidget {
             ),
             const Divider(),
             const SizedBox(height: 24),
-            AppButton(
+            sample.AppButton(
               onPressed: () {},
-              variant: AppButtonVariant.outlined,
+              variant: sample.AppButtonVariant.outlined,
               expanded: true,
               child: const Text('Sign Out'),
             ),
@@ -351,29 +355,29 @@ class ComponentsPage extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           Wrap(spacing: 8, runSpacing: 8, children: [
-            AppButton(
+            sample.AppButton(
               onPressed: () {},
-              variant: AppButtonVariant.primary,
+              variant: sample.AppButtonVariant.primary,
               child: const Text('Primary'),
             ),
-            AppButton(
+            sample.AppButton(
               onPressed: () {},
-              variant: AppButtonVariant.secondary,
+              variant: sample.AppButtonVariant.secondary,
               child: const Text('Secondary'),
             ),
-            AppButton(
+            sample.AppButton(
               onPressed: () {},
-              variant: AppButtonVariant.outlined,
+              variant: sample.AppButtonVariant.outlined,
               child: const Text('Outlined'),
             ),
-            AppButton(
+            sample.AppButton(
               onPressed: () {},
-              variant: AppButtonVariant.text,
+              variant: sample.AppButtonVariant.text,
               child: const Text('Text'),
             ),
-            AppButton(
+            sample.AppButton(
               onPressed: () {},
-              variant: AppButtonVariant.tonal,
+              variant: sample.AppButtonVariant.tonal,
               child: const Text('Tonal'),
             ),
           ]),
@@ -381,26 +385,26 @@ class ComponentsPage extends StatelessWidget {
           Text('With Icons', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           Wrap(spacing: 8, runSpacing: 8, children: [
-            AppButton(
+            sample.AppButton(
               onPressed: () {},
               icon: Amicons.lucide_arrow_right,
               child: const Text('Next'),
             ),
-            AppButton(
+            sample.AppButton(
               onPressed: () {},
-              variant: AppButtonVariant.outlined,
+              variant: sample.AppButtonVariant.outlined,
               icon: Amicons.iconly_download_broken,
               child: const Text('Download'),
             ),
-            AppButton(
+            sample.AppButton(
               onPressed: () {},
-              variant: AppButtonVariant.tonal,
+              variant: sample.AppButtonVariant.tonal,
               icon: Amicons.lucide_search,
               child: const Text('Search'),
             ),
-            AppButton(
+            sample.AppButton(
               onPressed: () {},
-              iconPosition: IconPosition.end,
+              iconPosition: sample.IconPosition.end,
               icon: Amicons.remix_external_link,
               child: const Text('Open'),
             ),
@@ -409,26 +413,26 @@ class ComponentsPage extends StatelessWidget {
           Text('Sizes', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           Wrap(spacing: 8, runSpacing: 8, children: [
-            AppButton(
+            sample.AppButton(
               onPressed: () {},
-              size: AppButtonSize.sm,
+              size: sample.AppButtonSize.sm,
               child: const Text('Small'),
             ),
-            AppButton(
+            sample.AppButton(
               onPressed: () {},
-              size: AppButtonSize.md,
+              size: sample.AppButtonSize.md,
               child: const Text('Medium'),
             ),
-            AppButton(
+            sample.AppButton(
               onPressed: () {},
-              size: AppButtonSize.lg,
+              size: sample.AppButtonSize.lg,
               child: const Text('Large'),
             ),
           ]),
           const SizedBox(height: 24),
           Text('Full Width', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
-          AppButton(
+          sample.AppButton(
             onPressed: () {},
             expanded: true,
             icon: Amicons.iconly_send_fill,
@@ -438,24 +442,24 @@ class ComponentsPage extends StatelessWidget {
           Text('Icon Buttons', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           Wrap(spacing: 8, runSpacing: 8, children: [
-            AppIconButton(
+            sample.AppIconButton(
               onPressed: () {},
               icon: Amicons.lucide_pen,
             ),
-            AppIconButton(
+            sample.AppIconButton(
               onPressed: () {},
               icon: Amicons.iconly_delete_broken,
-              variant: AppButtonVariant.outlined,
+              variant: sample.AppButtonVariant.outlined,
             ),
-            AppIconButton(
+            sample.AppIconButton(
               onPressed: () {},
               icon: Amicons.lucide_settings2,
-              variant: AppButtonVariant.tonal,
+              variant: sample.AppButtonVariant.tonal,
             ),
-            AppIconButton(
+            sample.AppIconButton(
               onPressed: () {},
               icon: Amicons.iconly_heart_broken,
-              variant: AppButtonVariant.text,
+              variant: sample.AppButtonVariant.text,
             ),
           ]),
           const SizedBox(height: 24),
