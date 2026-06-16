@@ -13,6 +13,10 @@ class AppSwitchField extends StatelessWidget {
   final bool isDestructive;
   final bool useCupertino;
   final Widget? suffix;
+  final Color? activeThumbColor;
+  final Color? activeTrackColor;
+  final Color? inactiveThumbColor;
+  final Color? inactiveTrackColor;
 
   const AppSwitchField({
     super.key,
@@ -25,16 +29,25 @@ class AppSwitchField extends StatelessWidget {
     this.isDestructive = false,
     this.useCupertino = false,
     this.suffix,
+    this.activeThumbColor,
+    this.activeTrackColor,
+    this.inactiveThumbColor,
+    this.inactiveTrackColor,
   });
 
-  factory AppSwitchField.withIcon({
+  factory AppSwitchField.card({
     Key? key,
     required String label,
     required bool value,
-    required IconData icon,
     String? subtitle,
     ValueChanged<bool>? onChanged,
     bool enabled = true,
+    Widget? leading,
+    bool isDestructive = false,
+    Color? activeThumbColor,
+    Color? activeTrackColor,
+    Color? inactiveThumbColor,
+    Color? inactiveTrackColor,
   }) =>
       AppSwitchField(
         key: key,
@@ -43,25 +56,8 @@ class AppSwitchField extends StatelessWidget {
         subtitle: subtitle,
         onChanged: onChanged,
         enabled: enabled,
-        leading: Icon(icon, size: 22),
-      );
-
-  factory AppSwitchField.danger({
-    Key? key,
-    required String label,
-    required bool value,
-    String? subtitle,
-    ValueChanged<bool>? onChanged,
-    bool enabled = true,
-  }) =>
-      AppSwitchField(
-        key: key,
-        label: label,
-        value: value,
-        subtitle: subtitle,
-        onChanged: onChanged,
-        enabled: enabled,
-        isDestructive: true,
+        leading: leading,
+        isDestructive: isDestructive,
       );
 
   factory AppSwitchField.compact({
@@ -79,6 +75,28 @@ class AppSwitchField extends StatelessWidget {
         onChanged: onChanged,
         enabled: enabled,
         useCupertino: useCupertino,
+      );
+
+  factory AppSwitchField.danger({
+    Key? key,
+    required String label,
+    required bool value,
+    String? subtitle,
+    ValueChanged<bool>? onChanged,
+    bool enabled = true,
+    Color? activeThumbColor,
+    Color? activeTrackColor,
+    Color? inactiveThumbColor,
+    Color? inactiveTrackColor,
+  }) =>
+      AppSwitchField(
+        key: key,
+        label: label,
+        value: value,
+        subtitle: subtitle,
+        onChanged: onChanged,
+        enabled: enabled,
+        isDestructive: true,
       );
 
   factory AppSwitchField.platformAdaptive({
@@ -130,6 +148,10 @@ class AppSwitchField extends StatelessWidget {
     String? subtitle,
     ValueChanged<bool>? onChanged,
     bool enabled = true,
+    Color? activeThumbColor,
+    Color? activeTrackColor,
+    Color? inactiveThumbColor,
+    Color? inactiveTrackColor,
   }) =>
       AppSwitchField(
         key: key,
@@ -139,6 +161,29 @@ class AppSwitchField extends StatelessWidget {
         onChanged: onChanged,
         enabled: enabled,
         leading: SizedBox(width: 36, height: 36, child: avatar),
+      );
+
+  factory AppSwitchField.withIcon({
+    Key? key,
+    required String label,
+    required bool value,
+    required IconData icon,
+    String? subtitle,
+    ValueChanged<bool>? onChanged,
+    bool enabled = true,
+    Color? activeThumbColor,
+    Color? activeTrackColor,
+    Color? inactiveThumbColor,
+    Color? inactiveTrackColor,
+  }) =>
+      AppSwitchField(
+        key: key,
+        label: label,
+        value: value,
+        subtitle: subtitle,
+        onChanged: onChanged,
+        enabled: enabled,
+        leading: Icon(icon, size: 22),
       );
 
   factory AppSwitchField.withSuffix({
@@ -162,27 +207,6 @@ class AppSwitchField extends StatelessWidget {
         suffix: suffix,
       );
 
-  factory AppSwitchField.card({
-    Key? key,
-    required String label,
-    required bool value,
-    String? subtitle,
-    ValueChanged<bool>? onChanged,
-    bool enabled = true,
-    Widget? leading,
-    bool isDestructive = false,
-  }) =>
-      AppSwitchField(
-        key: key,
-        label: label,
-        value: value,
-        subtitle: subtitle,
-        onChanged: onChanged,
-        enabled: enabled,
-        leading: leading,
-        isDestructive: isDestructive,
-      );
-
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -192,15 +216,18 @@ class AppSwitchField extends StatelessWidget {
         ? CupertinoSwitch(
             value: value,
             onChanged: enabled ? onChanged : null,
-            activeColor: accentColor,
+            activeTrackColor: activeTrackColor ?? accentColor,
+            //activeTrackColor: activeThumbColor ?? accentColor,
           )
         : Switch(
             value: value,
             onChanged: enabled ? onChanged : null,
-            activeThumbColor: accentColor,
-            activeTrackColor: accentColor.withValues(alpha: 0.35),
-            inactiveThumbColor: colors.textSecondary,
-            inactiveTrackColor: colors.border.withValues(alpha: 0.5),
+            activeThumbColor: activeThumbColor ?? accentColor,
+            activeTrackColor:
+                activeTrackColor ?? accentColor.withValues(alpha: 0.35),
+            inactiveThumbColor: inactiveThumbColor ?? colors.textSecondary,
+            inactiveTrackColor:
+                inactiveTrackColor ?? colors.border.withValues(alpha: 0.5),
           );
 
     return Opacity(

@@ -376,7 +376,6 @@ class AppFAB extends StatelessWidget {
   final bool isPulseEnabled;
   final bool isExtended;
   final Color? color;
-  final double? size;
 
   const AppFAB({
     super.key,
@@ -386,7 +385,6 @@ class AppFAB extends StatelessWidget {
     this.isPulseEnabled = false,
     this.isExtended = false,
     this.color,
-    this.size,
   });
 
   factory AppFAB.extended({
@@ -409,7 +407,6 @@ class AppFAB extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final bgColor = color ?? colors.primary;
-    final fabSize = size ?? 56;
 
     Widget fab = isExtended
         ? FloatingActionButton.extended(
@@ -422,15 +419,11 @@ class AppFAB extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           )
-        : SizedBox(
-            width: fabSize,
-            height: fabSize,
-            child: FloatingActionButton(
-              onPressed: onPressed,
-              backgroundColor: bgColor,
-              foregroundColor: Colors.white,
-              child: Icon(icon),
-            ),
+        : FloatingActionButton(
+            onPressed: onPressed,
+            backgroundColor: bgColor,
+            foregroundColor: Colors.white,
+            child: Icon(icon),
           );
 
     if (isPulseEnabled) {
