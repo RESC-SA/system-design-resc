@@ -1,0 +1,19 @@
+import 'package:flutter/widgets.dart';
+
+/// Model for a single navigation item.
+@immutable
+class LiquidNavItem {
+  const LiquidNavItem({
+    required this.icon,
+    this.activeIcon,
+    this.inactiveIcon,
+    this.label,
+    this.semanticLabel,
+  });
+
+  final IconData icon;
+  final IconData? activeIcon;
+  final IconData? inactiveIcon;
+  final String? label;
+  final String? semanticLabel;
+}

@@ -42,5 +42,9 @@ export 'src/components/swipe_to_confirm_button.dart';
 export 'src/components/glow_ring.dart';
 export 'src/components/staggered_reveal_list.dart';
 export 'src/components/flip_card.dart';
+export 'src/components/bottom_nav_bar.dart';
+export 'src/components/liquid_nav_item.dart';
+export 'src/components/liquid_nav_style.dart';
+export 'src/components/liquid_bottom_nav_bar.dart';
 // Routing
 export 'src/routing/app_router.dart';
