@@ -104,6 +104,8 @@ class AppButton extends StatelessWidget {
             onLongPress: onLongPress,
             child: Container(
               padding: _padding,
+              width: 50,
+              height: 50,
               decoration: BoxDecoration(
                 color: customBgColor,
                 borderRadius: BorderRadius.circular(borderRadius),
@@ -112,10 +114,11 @@ class AppButton extends StatelessWidget {
                     : null,
                 boxShadow: boxShadow,
               ),
-              child: defaultTextStyle ?? DefaultTextStyle(
-                style: TextStyle(color: customColor),
-                child: content,
-              ),
+              child: defaultTextStyle ??
+                  DefaultTextStyle(
+                    style: TextStyle(color: customColor),
+                    child: content,
+                  ),
             ),
           );
         }
@@ -204,6 +207,124 @@ class AppButton extends StatelessWidget {
   }
 }
 
+class AppButtonGestureDetector extends StatefulWidget {
+  final Widget child;
+  final VoidCallback? onTap;
+  final Color? backgroundColor;
+  final BoxShadow? boxShadow;
+  final EdgeInsetsGeometry? padding;
+  final ShapeBorder? shape;
+  final bool? enabled;
+  final bool? isLoading;
+  final double? width;
+  final double? height;
+  final double? borderRadius;
+  final List<Color>? loadingColors;
+
+  const AppButtonGestureDetector(
+      {super.key,
+      required this.child,
+      this.onTap,
+      this.backgroundColor,
+      this.boxShadow,
+      this.padding,
+      this.shape,
+      this.enabled,
+      this.isLoading,
+      this.width,
+      this.height,
+      this.borderRadius,
+      this.loadingColors});
+
+  @override
+  State<AppButtonGestureDetector> createState() =>
+      _AppButtonGestureDetectorState();
+}
+
+class _AppButtonGestureDetectorState extends State<AppButtonGestureDetector>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+    _animation = Tween<double>(begin: 0, end: 360).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.linear),
+    );
+    if (widget.isLoading == true) _controller.repeat();
+  }
+
+  @override
+  void didUpdateWidget(AppButtonGestureDetector old) {
+    super.didUpdateWidget(old);
+    if (widget.isLoading == true) {
+      _controller.repeat();
+    } else {
+      _controller.stop();
+      _controller.reset();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loading = widget.isLoading == true;
+    final colors = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: widget.padding ?? const EdgeInsetsDirectional.all(8.0),
+      child: Container(
+        width: widget.width,
+        height: widget.height,
+        decoration: BoxDecoration(
+          color: loading ? null : widget.backgroundColor,
+          boxShadow: widget.boxShadow != null ? [widget.boxShadow!] : null,
+          borderRadius: BorderRadius.circular(widget.borderRadius ?? 8),
+        ),
+        child: loading
+            ? AnimatedBuilder(
+                animation: _controller,
+                builder: (context, _) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      borderRadius:
+                          BorderRadius.circular(widget.borderRadius ?? 8),
+                      gradient: SweepGradient(
+                        colors: widget.loadingColors ?? [
+                          widget.backgroundColor ?? colors.surface,
+                          colors.primary.withValues(alpha: 0.4),
+                          colors.primary,
+                          colors.primary.withValues(alpha: 0.4),
+                          widget.backgroundColor ?? colors.surface,
+                        ],
+                        transform: GradientRotation(
+                          _animation.value * 3.14159 / 180,
+                        ),
+                      ),
+                    ),
+                    child: Center(child: widget.child),
+                  );
+                },
+              )
+            : GestureDetector(
+                onTap: widget.onTap,
+                child: widget.child,
+              ),
+      ),
+    );
+  }
+}
+
 enum AppButtonSize { sm, md, lg, custom }
 
 enum AppButtonVariant { primary, secondary, outlined, text, tonal, custom }
@@ -217,7 +338,7 @@ class AppIconButton extends StatelessWidget {
   final AppButtonVariant variant;
   final double? customIconSize;
   final double? customButtonSize;
-  
+
   const AppIconButton({
     super.key,
     required this.onPressed,
