@@ -13,6 +13,9 @@ dependencies:
   flutter_animate: ^4.5.2
   flutter_design_system:
     path: ../
+  flutter_fortress:
+    path: lib/core/flutter_fortress
+  dio: ^5.4.0
 
 dev_dependencies:
   flutter_test:

@@ -9,6 +9,7 @@ import 'lists_page.dart';
 import 'scaffolds_page.dart';
 import 'feedback_page.dart';
 import 'cards_page.dart';
+import 'security_showcase_page.dart';
 
 class HomePage extends StatelessWidget {
   final VoidCallback onToggleTheme;
@@ -75,6 +76,13 @@ class HomePage extends StatelessWidget {
         desc: 'Dialogs, BottomSheets, SnackBars, AppText',
         color: context.colors.neonOrange,
         page: const FeedbackPage(),
+      ),
+      _Section(
+        icon: Amicons.lucide_shield_check,
+        label: 'Security RASP',
+        desc: 'Jailbreak, Frida scan, SSL Pinning, SecureScreen',
+        color: context.colors.neonOrange,
+        page: const SecurityShowcasePage(),
       ),
     ];
 
