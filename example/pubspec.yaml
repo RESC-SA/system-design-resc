@@ -1,0 +1,22 @@
+name: design_system_example
+description: Comprehensive widget showcase for the Flutter Design System
+publish_to: none
+version: 1.0.0
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  amicons: ^1.0.1
+  flutter_animate: ^4.5.2
+  flutter_design_system:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
