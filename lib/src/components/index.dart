@@ -1,15 +1,13 @@
-/// System Design Widgets — Barrel Export
-///
-/// Single import to access all design system primitives:
-///
-/// ```dart
-/// import 'package:inverter_gateway/core/utils/system-design-widgets/index.dart';
-/// ```
-library system_design_widgets;
-
 export 'text.dart';
-export 'buttons-icon.dart';
-export 'fields.dart';
+export 'buttons.dart';
+export 'toggle_button.dart';
+export 'text_field.dart';
+export 'search_field.dart';
+export 'dropdown_field.dart';
+export 'switch_field.dart';
+export 'slider_field.dart';
+export 'checkbox_field.dart';
+export 'segmented_field.dart';
 export 'containers.dart';
 export 'scaffolds.dart';
 export 'lists.dart';

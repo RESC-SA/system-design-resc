@@ -16,9 +16,16 @@ export 'src/tokens/spacing.dart';
 export 'src/tokens/typography.dart';
 
 // Component exports
-export 'src/components/buttons-icon.dart';
+export 'src/components/buttons.dart';
+export 'src/components/toggle_button.dart';
 export 'src/components/containers.dart';
-export 'src/components/fields.dart';
+export 'src/components/text_field.dart';
+export 'src/components/search_field.dart';
+export 'src/components/dropdown_field.dart';
+export 'src/components/switch_field.dart';
+export 'src/components/slider_field.dart';
+export 'src/components/checkbox_field.dart';
+export 'src/components/segmented_field.dart';
 export 'src/components/glass_container.dart';
 export 'src/components/indicators.dart';
 export 'src/components/lists.dart';
