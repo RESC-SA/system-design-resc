@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../theme/theme_extensions.dart';
+import 'text_direction_extension.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AppSearchField
@@ -76,6 +77,7 @@ class _AppSearchFieldState extends State<AppSearchField> {
       autofocus: widget.autofocus,
       onSubmitted: widget.onSubmitted,
       textInputAction: TextInputAction.search,
+      textDirection: _ctrl.estimateDirection(),
       style: TextStyle(color: colors.textPrimary, fontSize: 15),
       decoration: InputDecoration(
         hintText: widget.hint ?? 'Search…',
@@ -938,6 +940,7 @@ class _AppTextFieldState extends State<AppTextField> {
       enabled: widget.enabled,
       readOnly: widget.readOnly,
       autofocus: widget.autofocus,
+      textDirection: widget.controller?.estimateDirection(),
       keyboardType: widget.keyboardType,
       textInputAction: widget.textInputAction,
       maxLength: widget.maxLength,

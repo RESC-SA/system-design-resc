@@ -10,6 +10,7 @@ unlinked.ds
 unlinked_spec.ds
 .fvm/
 pubspec.lock
+!example/pubspec.lock
 
 # IDE
 .idea/
