@@ -14,6 +14,8 @@ class AppIconButton extends StatelessWidget {
   final String? tooltip;
   final bool isLoading;
   final bool isCircle;
+  final Color? overrideIconColor;
+  final Color? overrideBgColor;
 
   const AppIconButton({
     super.key,
@@ -25,6 +27,8 @@ class AppIconButton extends StatelessWidget {
     this.tooltip,
     this.isLoading = false,
     this.isCircle = true,
+    this.overrideIconColor,
+    this.overrideBgColor,
   });
 
   factory AppIconButton.neon({
@@ -108,6 +112,9 @@ class AppIconButton extends StatelessWidget {
         bgColor = colors.surface2;
         iconColor = colors.textSecondary;
     }
+
+    if (overrideIconColor != null) iconColor = overrideIconColor!;
+    if (overrideBgColor != null) bgColor = overrideBgColor!;
 
     Widget button = Opacity(
       opacity: isDisabled ? 0.45 : 1.0,
@@ -368,6 +375,8 @@ class AppFAB extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool isPulseEnabled;
   final bool isExtended;
+  final Color? color;
+  final double? size;
 
   const AppFAB({
     super.key,
@@ -376,6 +385,8 @@ class AppFAB extends StatelessWidget {
     this.onPressed,
     this.isPulseEnabled = false,
     this.isExtended = false,
+    this.color,
+    this.size,
   });
 
   factory AppFAB.extended({
@@ -383,6 +394,7 @@ class AppFAB extends StatelessWidget {
     required String label,
     VoidCallback? onPressed,
     bool isPulseEnabled = false,
+    Color? color,
   }) =>
       AppFAB(
         icon: icon,
@@ -390,16 +402,19 @@ class AppFAB extends StatelessWidget {
         onPressed: onPressed,
         isPulseEnabled: isPulseEnabled,
         isExtended: true,
+        color: color,
       );
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final bgColor = color ?? colors.primary;
+    final fabSize = size ?? 56;
 
     Widget fab = isExtended
         ? FloatingActionButton.extended(
             onPressed: onPressed,
-            backgroundColor: colors.primary,
+            backgroundColor: bgColor,
             foregroundColor: Colors.white,
             icon: Icon(icon),
             label: Text(
@@ -407,11 +422,15 @@ class AppFAB extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           )
-        : FloatingActionButton(
-            onPressed: onPressed,
-            backgroundColor: colors.primary,
-            foregroundColor: Colors.white,
-            child: Icon(icon),
+        : SizedBox(
+            width: fabSize,
+            height: fabSize,
+            child: FloatingActionButton(
+              onPressed: onPressed,
+              backgroundColor: bgColor,
+              foregroundColor: Colors.white,
+              child: Icon(icon),
+            ),
           );
 
     if (isPulseEnabled) {
@@ -425,11 +444,11 @@ class AppFAB extends StatelessWidget {
           )
           .boxShadow(
             begin: BoxShadow(
-              color: colors.primary.withValues(alpha: 0.3),
+              color: bgColor.withValues(alpha: 0.3),
               blurRadius: 8,
             ),
             end: BoxShadow(
-              color: colors.primary.withValues(alpha: 0.7),
+              color: bgColor.withValues(alpha: 0.7),
               blurRadius: 24,
               spreadRadius: 4,
             ),

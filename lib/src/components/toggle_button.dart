@@ -10,6 +10,10 @@ class AppToggleButton extends StatelessWidget {
   final ValueChanged<bool>? onChanged;
   final IconData? icon;
   final bool isLoading;
+  final Color? activeColor;
+  final Color? inactiveColor;
+  final double borderRadius;
+  final EdgeInsetsGeometry? padding;
 
   const AppToggleButton({
     super.key,
@@ -19,19 +23,25 @@ class AppToggleButton extends StatelessWidget {
     this.onChanged,
     this.icon,
     this.isLoading = false,
+    this.activeColor,
+    this.inactiveColor,
+    this.borderRadius = 12,
+    this.padding,
   });
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final effectiveActive = activeColor ?? colors.neonGreen;
+    final effectiveInactive = inactiveColor ?? colors.textSecondary;
 
     return Container(
       decoration: BoxDecoration(
         color: colors.surface2,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(
           color: value
-              ? colors.neonGreen.withValues(alpha: 0.4)
+              ? effectiveActive.withValues(alpha: 0.4)
               : colors.border,
         ),
       ),
@@ -41,19 +51,20 @@ class AppToggleButton extends StatelessWidget {
           onTap: isLoading || onChanged == null
               ? null
               : () => onChanged!(!value),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(borderRadius),
           child: Padding(
-            padding: const EdgeInsetsDirectional.symmetric(
-              horizontal: 16,
-              vertical: 14,
-            ),
+            padding: padding ??
+                const EdgeInsetsDirectional.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
             child: Row(
               children: [
                 if (icon != null) ...[
                   Icon(
                     icon,
                     size: 20,
-                    color: value ? colors.neonGreen : colors.textSecondary,
+                    color: value ? effectiveActive : effectiveInactive,
                   ),
                   const SizedBox(width: 12),
                 ],
@@ -90,16 +101,16 @@ class AppToggleButton extends StatelessWidget {
                         height: 22,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: colors.primary,
+                          color: effectiveActive,
                         ),
                       )
                     : Switch(
                         value: value,
                         onChanged: onChanged,
-                        activeThumbColor: colors.neonGreen,
+                        activeThumbColor: effectiveActive,
                         activeTrackColor:
-                            colors.neonGreen.withValues(alpha: 0.35),
-                        inactiveThumbColor: colors.textSecondary,
+                            effectiveActive.withValues(alpha: 0.35),
+                        inactiveThumbColor: effectiveInactive,
                         inactiveTrackColor:
                             colors.border.withValues(alpha: 0.5),
                       ),
