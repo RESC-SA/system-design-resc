@@ -19,7 +19,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final sections = [
+    final sections = <_Section>[
       _Section(
         icon: Amicons.lucide_box,
         label: 'Containers',
