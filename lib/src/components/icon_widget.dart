@@ -48,8 +48,8 @@ class IconWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  isShowContainerBackground! ? Container(
-      width: width,
-      height: height,
+      width: width ?? 24,
+      height: height ?? 24,
       decoration: BoxDecoration(
         color: containerBackgroundColor ?? Colors.grey[200],
         borderRadius: containerBorderRadius ?? BorderRadius.circular(8),
@@ -57,9 +57,9 @@ class IconWidget extends StatelessWidget {
       ),
       child: Icon(
         icon,
-        size: size,
-        color: color,
-        weight: weight,
+        size: size ?? 24,
+        color: color ?? Colors.black,
+        weight: weight ?? 400,
         fill: fill ?? 3,
         textDirection: textDirection ?? TextDirection.ltr,
         fontWeight: fontWeight ?? FontWeight.w400,
@@ -72,9 +72,9 @@ class IconWidget extends StatelessWidget {
       ),
     ) : Icon(
       icon,
-      size: size,
-      color: color,
-      weight: weight,
+      size: size ?? 24,
+      color: color ?? Colors.black,
+      weight: weight ?? 400,
       fill: fill ?? 3,
       textDirection: textDirection ?? TextDirection.ltr,
       fontWeight: fontWeight ?? FontWeight.w400,
