@@ -1,49 +1,91 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_design_system/flutter_design_system.dart';
+
+import '../theme/theme_extensions.dart';
 
 @immutable
 class LiquidNavStyle {
   const LiquidNavStyle({
-    this.backgroundColor = const Color(0x00000000),
-    this.containerColor = const Color(0xFFF7F7F8),
-    this.liquidColor = const Color(0xFF2D6BFF),
-    this.activeIconColor = const Color(0xFFFFFFFF),
-    this.inactiveIconColor = const Color(0xFF6B7280),
+    this.backgroundColor,
+    this.containerColor,
+    this.liquidColor,
+    this.activeIconColor,
+    this.inactiveIconColor,
     this.border,
-    this.borderSide = const BorderSide(color: Color(0x12000000), width: 0.8),
-    this.borderRadius = const BorderRadius.all(Radius.circular(28)),
-    this.boxShadow = const <BoxShadow>[
-      BoxShadow(
-        color: Color(0x0D000000),
-        blurRadius: 18,
-        offset: Offset(0, 6),
-      ),
-    ],
+    this.borderSide,
+    this.borderRadius,
+    this.boxShadow,
     this.labelStyle,
     this.activeLabelStyle,
     this.showLabel = false,
     this.blurSigma,
   });
 
-  final Color backgroundColor;
-  final Color containerColor;
-  final Color liquidColor;
-  final Color activeIconColor;
-  final Color inactiveIconColor;
+  final Color? backgroundColor;
+  final Color? containerColor;
+  final Color? liquidColor;
+  final Color? activeIconColor;
+  final Color? inactiveIconColor;
   final Border? border;
   final BorderSide? borderSide;
-  final BorderRadiusGeometry borderRadius;
-  final List<BoxShadow> boxShadow;
+  final BorderRadiusGeometry? borderRadius;
+  final List<BoxShadow>? boxShadow;
   final TextStyle? labelStyle;
   final TextStyle? activeLabelStyle;
   final bool showLabel;
-
-  /// Optional glass effect blur. Set null or 0 to disable.
   final double? blurSigma;
 
   Border? resolveBorder() {
     if (border != null) return border;
     if (borderSide != null) return Border.fromBorderSide(borderSide!);
     return null;
+  }
+
+  LiquidNavStyle mergeWith(covariant LiquidNavStyle? other) {
+    if (other == null) return this;
+    return copyWith(
+      backgroundColor: other.backgroundColor,
+      containerColor: other.containerColor,
+      liquidColor: other.liquidColor,
+      activeIconColor: other.activeIconColor,
+      inactiveIconColor: other.inactiveIconColor,
+      border: other.border,
+      borderSide: other.borderSide,
+      borderRadius: other.borderRadius,
+      boxShadow: other.boxShadow,
+      labelStyle: other.labelStyle,
+      activeLabelStyle: other.activeLabelStyle,
+      showLabel: other.showLabel,
+      blurSigma: other.blurSigma,
+    );
+  }
+
+  LiquidNavStyle resolve(BuildContext context) {
+    final colors = Theme.of(context).extension<AppThemeExtension>()!;
+    final isLight = colors == AppThemeExtension.defaultLight;
+    return LiquidNavStyle(
+      backgroundColor: backgroundColor ?? const Color(0x00000000),
+      containerColor: containerColor ??
+          (isLight ? const Color(0xCCF7F7F8) : const Color(0xCC1C1C1E)),
+      liquidColor: liquidColor ?? colors.primary,
+      activeIconColor: activeIconColor ?? Colors.white,
+      inactiveIconColor:
+          inactiveIconColor ?? (isLight ? const Color(0xFF6B7280) : const Color(0xFF9CA3AF)),
+      borderSide:
+          borderSide ?? BorderSide(color: (isLight ? Colors.black : Colors.white).withValues(alpha: 0.07), width: 0.8),
+      borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(28)),
+      boxShadow: boxShadow ?? const [
+        BoxShadow(
+          color: Color(0x0D000000),
+          blurRadius: 18,
+          offset: Offset(0, 6),
+        ),
+      ],
+      labelStyle: labelStyle,
+      activeLabelStyle: activeLabelStyle,
+      showLabel: showLabel,
+      blurSigma: blurSigma ?? 16,
+    );
   }
 
   LiquidNavStyle copyWith({

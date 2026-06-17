@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../theme/theme_extensions.dart';
 import 'liquid_nav_item.dart';
 import 'liquid_nav_style.dart';
 
@@ -248,22 +249,25 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
   @override
   Widget build(BuildContext context) {
     final int safeIndex = widget.currentIndex.clamp(0, widget.items.length - 1);
+    final colors = context.colors;
 
-    final style = widget.style.copyWith(
-      backgroundColor: widget.backgroundColor,
-      containerColor: widget.containerColor,
-      liquidColor: widget.liquidColor,
-      activeIconColor: widget.activeIconColor,
-      inactiveIconColor: widget.inactiveIconColor,
-      border: widget.border,
-      borderSide: widget.borderSide,
-      borderRadius: widget.borderRadius,
-      boxShadow: widget.boxShadow,
-      labelStyle: widget.labelStyle,
-      activeLabelStyle: widget.activeLabelStyle,
-      showLabel: widget.showLabel,
-      blurSigma: widget.blurSigma,
-    );
+    final style = widget.style
+        .copyWith(
+          backgroundColor: widget.backgroundColor,
+          containerColor: widget.containerColor,
+          liquidColor: widget.liquidColor,
+          activeIconColor: widget.activeIconColor,
+          inactiveIconColor: widget.inactiveIconColor,
+          border: widget.border,
+          borderSide: widget.borderSide,
+          borderRadius: widget.borderRadius,
+          boxShadow: widget.boxShadow,
+          labelStyle: widget.labelStyle,
+          activeLabelStyle: widget.activeLabelStyle,
+          showLabel: widget.showLabel,
+          blurSigma: widget.blurSigma,
+        )
+        .resolve(context);
 
     return Container(
       color: style.backgroundColor,
@@ -334,13 +338,13 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                       children: [
                         Positioned.fill(
                           child: ClipRRect(
-                            borderRadius: style.borderRadius,
+                            borderRadius: style.borderRadius!,
                             child: BackdropFilter(
                               filter: ImageFilter.blur(
                                 sigmaX: style.blurSigma ?? 0,
                                 sigmaY: style.blurSigma ?? 0,
                               ),
-                              child: ColoredBox(color: style.containerColor),
+                              child: ColoredBox(color: style.containerColor!),
                             ),
                           ),
                         ),
@@ -368,8 +372,8 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                       ? _dragWobbleController.value
                                       : 0,
                                   horizontalInset: resolvedPadding.left,
-                                  primaryColor: style.liquidColor,
-                                  surfaceColor: style.containerColor,
+                                  primaryColor: style.liquidColor!,
+                                  surfaceColor: style.containerColor!,
                                   blobBaseWidthFactor:
                                       widget.blobBaseWidthFactor,
                                   blobExpandedWidthFactor:
@@ -441,7 +445,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                                   border: Border.all(
                                                     color: widget
                                                             .badgeBorderColor ??
-                                                        style.containerColor,
+                                                        style.containerColor!,
                                                     width: 1.5,
                                                   ),
                                                 ),
