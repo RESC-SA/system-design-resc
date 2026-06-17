@@ -91,6 +91,10 @@ class AppTextField extends StatefulWidget {
   final Color? errorColor;
   final AppFieldSize size;
   final AppTextFieldXType type;
+  final bool scribbleEnabled;
+  final ScrollController? scrollController;
+  final ScrollPhysics? scrollPhysics;
+  final FormFieldSetter<String>? onSaved;
 
   const AppTextField({
     super.key,
@@ -126,6 +130,10 @@ class AppTextField extends StatefulWidget {
     this.errorColor,
     this.size = AppFieldSize.md,
     this.type = AppTextFieldXType.text,
+    this.scribbleEnabled = false,
+    this.scrollController,
+    this.scrollPhysics,
+    this.onSaved,
   });
 
   factory AppTextField.email({
@@ -152,6 +160,9 @@ class AppTextField extends StatefulWidget {
         onSubmitted: onSubmitted,
         enabled: enabled,
         autofocus: autofocus,
+        scribbleEnabled: false,
+        scrollController: null,
+        scrollPhysics: null,
       );
 
   factory AppTextField.password({
@@ -199,6 +210,10 @@ class AppTextField extends StatefulWidget {
         onSubmitted: onSubmitted,
         enabled: enabled,
         type: AppTextFieldXType.phone,
+        scribbleEnabled: false,
+        scrollController: null,
+        scrollPhysics: null,
+        onSaved: null,
       );
 
   factory AppTextField.username({
@@ -223,6 +238,10 @@ class AppTextField extends StatefulWidget {
         onChanged: onChanged,
         onSubmitted: onSubmitted,
         enabled: enabled,
+        scribbleEnabled: false,
+        scrollController: null,
+        scrollPhysics: null,
+        onSaved: null,
       );
 
   factory AppTextField.name({
@@ -247,6 +266,10 @@ class AppTextField extends StatefulWidget {
         onChanged: onChanged,
         onSubmitted: onSubmitted,
         enabled: enabled,
+        scribbleEnabled: false,
+        scrollController: null,
+        scrollPhysics: null,
+        onSaved: null,
       );
 
   factory AppTextField.multiline({
@@ -271,7 +294,11 @@ class AppTextField extends StatefulWidget {
         onChanged: onChanged,
         validator: validator,
         enabled: enabled,
-      );
+        scribbleEnabled: false,
+        scrollController: null,
+        scrollPhysics: null,
+        onSaved: null,
+        );
 
   factory AppTextField.small({
     Key? key,
@@ -317,6 +344,9 @@ class AppTextField extends StatefulWidget {
     TextInputAction? textInputAction,
     void Function(String)? onSubmitted,
     bool obscureText = false,
+    FormFieldSetter<String>? onSaved,
+    final ScrollController? scrollController,
+    final ScrollPhysics? scrollPhysics,
 
   }) =>
       AppTextField(
@@ -341,6 +371,10 @@ class AppTextField extends StatefulWidget {
         textInputAction: textInputAction,
         onSubmitted: onSubmitted,
         obscureText: obscureText,
+        scribbleEnabled: false,
+        scrollController: scrollController,
+        scrollPhysics: scrollPhysics,
+        onSaved: onSaved,
       );
 
   @override
@@ -436,6 +470,10 @@ class _AppTextFieldState extends State<AppTextField> {
     Widget field = TextFormField(
       controller: widget.controller,
       initialValue: widget.initialValue,
+      scribbleEnabled: widget.scribbleEnabled,
+      scrollController: widget.scrollController,
+      scrollPhysics: widget.scrollPhysics,
+      onSaved: widget.onSaved,
       obscureText: _obscured,
       enabled: widget.enabled,
       readOnly: widget.readOnly,
