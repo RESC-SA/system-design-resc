@@ -329,3 +329,14 @@ extension TextStyleX on TextStyle {
   TextStyle lineH(double h) => copyWith(height: h);
   TextStyle letter(double s) => copyWith(letterSpacing: s);
 }
+// platform specific extensions
+extension PlatformX on BuildContext {
+  bool get isMobile => Theme.of(this).platform == TargetPlatform.android || Theme.of(this).platform == TargetPlatform.iOS;
+  bool get isDesktop => Theme.of(this).platform == TargetPlatform.macOS || Theme.of(this).platform == TargetPlatform.windows;
+  bool get isWeb => Theme.of(this).platform == TargetPlatform.fuchsia;
+  bool get isAndroid => Theme.of(this).platform == TargetPlatform.android;
+  bool get isIOS => Theme.of(this).platform == TargetPlatform.iOS;
+  bool get isMacOS => Theme.of(this).platform == TargetPlatform.macOS;
+  bool get isWindows => Theme.of(this).platform == TargetPlatform.windows;
+  bool get isFuchsia => Theme.of(this).platform == TargetPlatform.fuchsia;
+}
