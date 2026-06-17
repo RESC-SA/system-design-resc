@@ -22,20 +22,20 @@ extension ContextX on BuildContext {
   double get topPadding => mq.padding.top;
   double get bottomPadding => mq.padding.bottom;
 
-  void showSnack(String msg, {Color? color}) {
+  void appShowSnack(String msg, {Color? color}) {
     ScaffoldMessenger.of(this)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(msg), backgroundColor: color));
   }
 
-  Future<T?> push<T>(Widget page) =>
+  Future<T?> appPush<T>(Widget page) =>
       Navigator.push<T>(this, MaterialPageRoute(builder: (_) => page));
 
-  Future<T?> pushReplacement<T>(Widget page) =>
+  Future<T?> appPushReplacement<T>(Widget page) =>
       Navigator.pushReplacement<T, dynamic>(
           this, MaterialPageRoute(builder: (_) => page));
 
-  void pop<T>([T? result]) => Navigator.pop(this, result);
+  void appPop<T>([T? result]) => Navigator.pop(this, result);
   bool get canPop => Navigator.of(this).canPop();
 }
 
