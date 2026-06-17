@@ -3,7 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import '../theme/theme_extensions.dart';
 
-enum AppIconButtonVariant { standard, neon, glass, danger }
+enum AppIconButtonVariant { standard, neon, glass, danger , check , close , delete , add , edit, scan, connect, copy }
 
 class AppIconButton extends StatelessWidget {
   final IconData icon;
@@ -12,10 +12,12 @@ class AppIconButton extends StatelessWidget {
   final double size;
   final double iconSize;
   final String? tooltip;
+  final String? label;
   final bool isLoading;
   final bool isCircle;
   final Color? overrideIconColor;
   final Color? overrideBgColor;
+  
 
   const AppIconButton({
     super.key,
@@ -25,6 +27,7 @@ class AppIconButton extends StatelessWidget {
     this.size = 44,
     this.iconSize = 22,
     this.tooltip,
+    this.label,
     this.isLoading = false,
     this.isCircle = true,
     this.overrideIconColor,
@@ -79,6 +82,134 @@ class AppIconButton extends StatelessWidget {
         tooltip: tooltip,
       );
 
+  factory AppIconButton.check({
+    required IconData icon,
+    VoidCallback? onPressed,
+    double size = 44,
+    double iconSize = 22,
+    String? tooltip,
+  }) =>
+      AppIconButton(
+        icon: icon,
+        onPressed: onPressed,
+        variant: AppIconButtonVariant.check,
+        size: size,
+        iconSize: iconSize,
+        tooltip: tooltip,
+      );
+
+  factory AppIconButton.close({
+    required IconData icon,
+    VoidCallback? onPressed,
+    double size = 44,
+    double iconSize = 22,
+    String? tooltip,
+  }) =>
+      AppIconButton(
+        icon: icon,
+        onPressed: onPressed,
+        variant: AppIconButtonVariant.close,
+        size: size,
+        iconSize: iconSize,
+        tooltip: tooltip,
+      );
+
+  factory AppIconButton.delete({
+    required IconData icon,
+    VoidCallback? onPressed,
+    double size = 44,
+    double iconSize = 22,
+    String? tooltip,
+  }) =>
+      AppIconButton(
+        icon: icon,
+        onPressed: onPressed,
+        variant: AppIconButtonVariant.delete,
+        size: size,
+        iconSize: iconSize,
+        tooltip: tooltip,
+      );
+
+  factory AppIconButton.add({
+    required IconData icon,
+    VoidCallback? onPressed,
+    double size = 44,
+    double iconSize = 22,
+    String? tooltip,
+  }) =>
+      AppIconButton(
+        icon: icon,
+        onPressed: onPressed,
+        variant: AppIconButtonVariant.add,
+        size: size,
+        iconSize: iconSize,
+        tooltip: tooltip,
+      );
+
+  factory AppIconButton.edit({
+    required IconData icon,
+    VoidCallback? onPressed,
+    double size = 44,
+    double iconSize = 22,
+    String? tooltip,
+  }) =>
+      AppIconButton(
+        icon: icon,
+        onPressed: onPressed,
+        variant: AppIconButtonVariant.edit,
+        size: size,
+        iconSize: iconSize,
+        tooltip: tooltip,
+      );
+
+  factory AppIconButton.scan({
+    required IconData icon,
+    VoidCallback? onPressed,
+    double size = 44,
+    double iconSize = 22,
+    String? tooltip,
+  }) =>
+      AppIconButton(
+        icon: icon,
+        onPressed: onPressed,
+        variant: AppIconButtonVariant.scan,
+        size: size,
+        iconSize: iconSize,
+        tooltip: tooltip,
+      );
+
+  factory AppIconButton.connect({
+    required IconData icon,
+    VoidCallback? onPressed,
+    double size = 44,
+    double iconSize = 22,
+    String? tooltip,
+  }) =>
+      AppIconButton(
+        icon: icon,
+        onPressed: onPressed,
+        variant: AppIconButtonVariant.connect,
+        size: size,
+        iconSize: iconSize,
+        tooltip: tooltip,
+      );
+
+  factory AppIconButton.copy({
+    required IconData icon,
+    VoidCallback? onPressed,
+    double size = 44,
+    double iconSize = 22,
+    String? tooltip,
+  }) =>
+      AppIconButton(
+        icon: icon,
+        onPressed: onPressed,
+        variant: AppIconButtonVariant.copy,
+        size: size,
+        iconSize: iconSize,
+        tooltip: tooltip,
+      );
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -105,10 +236,33 @@ class AppIconButton extends StatelessWidget {
         iconColor = colors.neonCyan;
         break;
       case AppIconButtonVariant.danger:
+      case AppIconButtonVariant.delete:
         bgColor = colors.neonRed.withValues(alpha: 0.12);
         iconColor = colors.neonRed;
         break;
-      default:
+      case AppIconButtonVariant.check:
+      case AppIconButtonVariant.add:
+        bgColor = colors.neonGreen.withValues(alpha: 0.12);
+        iconColor = colors.neonGreen;
+        break;
+      case AppIconButtonVariant.edit:
+        bgColor = colors.neonOrange.withValues(alpha: 0.12);
+        iconColor = colors.neonOrange;
+        break;
+      case AppIconButtonVariant.scan:
+      case AppIconButtonVariant.connect:
+        bgColor = colors.neonBlue.withValues(alpha: 0.12);
+        iconColor = colors.neonBlue;
+        break;
+      case AppIconButtonVariant.copy:
+        bgColor = colors.neonCyan.withValues(alpha: 0.12);
+        iconColor = colors.neonCyan;
+        break;
+      case AppIconButtonVariant.close:
+        bgColor = colors.surface2;
+        iconColor = colors.textSecondary;
+        break;
+      case AppIconButtonVariant.standard:
         bgColor = colors.surface2;
         iconColor = colors.textSecondary;
     }
@@ -140,18 +294,34 @@ class AppIconButton extends StatelessWidget {
                   : null,
               boxShadow: shadows,
             ),
-            child: Center(
-              child: isLoading
-                  ? SizedBox(
-                      width: iconSize - 4,
-                      height: iconSize - 4,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: iconColor,
-                      ),
-                    )
-                  : Icon(icon, size: iconSize, color: iconColor),
-            ),
+            child: isLoading
+                ? SizedBox(
+                    width: iconSize - 4,
+                    height: iconSize - 4,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: iconColor,
+                    ),
+                  )
+                : label != null
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(icon, size: iconSize, color: iconColor),
+                          const SizedBox(height: 4),
+                          Text(
+                            label!,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: iconColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      )
+                    : Icon(icon, size: iconSize, color: iconColor),
           ),
         ),
       ),
