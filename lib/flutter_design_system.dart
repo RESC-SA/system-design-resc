@@ -46,5 +46,9 @@ export 'src/components/bottom_nav_bar.dart';
 export 'src/components/liquid_nav_item.dart';
 export 'src/components/liquid_nav_style.dart';
 export 'src/components/liquid_bottom_nav_bar.dart';
+// Utility extensions
+export 'src/utils/extensions.dart';
+export 'src/utils/text_field_extensions.dart';
+
 // Routing
 export 'src/routing/app_router.dart';
