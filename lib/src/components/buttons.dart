@@ -3,7 +3,89 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import '../theme/theme_extensions.dart';
 
-enum AppIconButtonVariant { standard, neon, glass, danger , check , close , delete , add , edit, scan, connect, copy }
+class AppFAB extends StatelessWidget {
+  final IconData icon;
+  final String? label;
+  final VoidCallback? onPressed;
+  final bool isPulseEnabled;
+  final bool isExtended;
+  final Color? color;
+
+  const AppFAB({
+    super.key,
+    required this.icon,
+    this.label,
+    this.onPressed,
+    this.isPulseEnabled = false,
+    this.isExtended = false,
+    this.color,
+  });
+
+  factory AppFAB.extended({
+    required IconData icon,
+    required String label,
+    VoidCallback? onPressed,
+    bool isPulseEnabled = false,
+    Color? color,
+  }) =>
+      AppFAB(
+        icon: icon,
+        label: label,
+        onPressed: onPressed,
+        isPulseEnabled: isPulseEnabled,
+        isExtended: true,
+        color: color,
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final bgColor = color ?? colors.primary;
+
+    Widget fab = isExtended
+        ? FloatingActionButton.extended(
+            onPressed: onPressed,
+            backgroundColor: bgColor,
+            foregroundColor: Colors.white,
+            icon: Icon(icon),
+            label: Text(
+              label ?? '',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          )
+        : FloatingActionButton(
+            onPressed: onPressed,
+            backgroundColor: bgColor,
+            foregroundColor: Colors.white,
+            child: Icon(icon),
+          );
+
+    if (isPulseEnabled) {
+      fab = fab
+          .animate(onPlay: (c) => c.repeat(reverse: true))
+          .scaleXY(
+            begin: 1.0,
+            end: 1.05,
+            duration: 900.ms,
+            curve: Curves.easeInOut,
+          )
+          .boxShadow(
+            begin: BoxShadow(
+              color: bgColor.withValues(alpha: 0.3),
+              blurRadius: 8,
+            ),
+            end: BoxShadow(
+              color: bgColor.withValues(alpha: 0.7),
+              blurRadius: 24,
+              spreadRadius: 4,
+            ),
+            duration: 900.ms,
+          );
+    }
+
+    return fab;
+  }
+}
 
 class AppIconButton extends StatelessWidget {
   final IconData icon;
@@ -17,7 +99,6 @@ class AppIconButton extends StatelessWidget {
   final bool isCircle;
   final Color? overrideIconColor;
   final Color? overrideBgColor;
-  
 
   const AppIconButton({
     super.key,
@@ -34,7 +115,7 @@ class AppIconButton extends StatelessWidget {
     this.overrideBgColor,
   });
 
-  factory AppIconButton.neon({
+  factory AppIconButton.add({
     required IconData icon,
     VoidCallback? onPressed,
     double size = 44,
@@ -44,39 +125,7 @@ class AppIconButton extends StatelessWidget {
       AppIconButton(
         icon: icon,
         onPressed: onPressed,
-        variant: AppIconButtonVariant.neon,
-        size: size,
-        iconSize: iconSize,
-        tooltip: tooltip,
-      );
-
-  factory AppIconButton.danger({
-    required IconData icon,
-    VoidCallback? onPressed,
-    double size = 44,
-    double iconSize = 22,
-    String? tooltip,
-  }) =>
-      AppIconButton(
-        icon: icon,
-        onPressed: onPressed,
-        variant: AppIconButtonVariant.danger,
-        size: size,
-        iconSize: iconSize,
-        tooltip: tooltip,
-      );
-
-  factory AppIconButton.glass({
-    required IconData icon,
-    VoidCallback? onPressed,
-    double size = 44,
-    double iconSize = 22,
-    String? tooltip,
-  }) =>
-      AppIconButton(
-        icon: icon,
-        onPressed: onPressed,
-        variant: AppIconButtonVariant.glass,
+        variant: AppIconButtonVariant.add,
         size: size,
         iconSize: iconSize,
         tooltip: tooltip,
@@ -114,70 +163,6 @@ class AppIconButton extends StatelessWidget {
         tooltip: tooltip,
       );
 
-  factory AppIconButton.delete({
-    required IconData icon,
-    VoidCallback? onPressed,
-    double size = 44,
-    double iconSize = 22,
-    String? tooltip,
-  }) =>
-      AppIconButton(
-        icon: icon,
-        onPressed: onPressed,
-        variant: AppIconButtonVariant.delete,
-        size: size,
-        iconSize: iconSize,
-        tooltip: tooltip,
-      );
-
-  factory AppIconButton.add({
-    required IconData icon,
-    VoidCallback? onPressed,
-    double size = 44,
-    double iconSize = 22,
-    String? tooltip,
-  }) =>
-      AppIconButton(
-        icon: icon,
-        onPressed: onPressed,
-        variant: AppIconButtonVariant.add,
-        size: size,
-        iconSize: iconSize,
-        tooltip: tooltip,
-      );
-
-  factory AppIconButton.edit({
-    required IconData icon,
-    VoidCallback? onPressed,
-    double size = 44,
-    double iconSize = 22,
-    String? tooltip,
-  }) =>
-      AppIconButton(
-        icon: icon,
-        onPressed: onPressed,
-        variant: AppIconButtonVariant.edit,
-        size: size,
-        iconSize: iconSize,
-        tooltip: tooltip,
-      );
-
-  factory AppIconButton.scan({
-    required IconData icon,
-    VoidCallback? onPressed,
-    double size = 44,
-    double iconSize = 22,
-    String? tooltip,
-  }) =>
-      AppIconButton(
-        icon: icon,
-        onPressed: onPressed,
-        variant: AppIconButtonVariant.scan,
-        size: size,
-        iconSize: iconSize,
-        tooltip: tooltip,
-      );
-
   factory AppIconButton.connect({
     required IconData icon,
     VoidCallback? onPressed,
@@ -205,6 +190,102 @@ class AppIconButton extends StatelessWidget {
         icon: icon,
         onPressed: onPressed,
         variant: AppIconButtonVariant.copy,
+        size: size,
+        iconSize: iconSize,
+        tooltip: tooltip,
+      );
+
+  factory AppIconButton.danger({
+    required IconData icon,
+    VoidCallback? onPressed,
+    double size = 44,
+    double iconSize = 22,
+    String? tooltip,
+  }) =>
+      AppIconButton(
+        icon: icon,
+        onPressed: onPressed,
+        variant: AppIconButtonVariant.danger,
+        size: size,
+        iconSize: iconSize,
+        tooltip: tooltip,
+      );
+
+  factory AppIconButton.delete({
+    required IconData icon,
+    VoidCallback? onPressed,
+    double size = 44,
+    double iconSize = 22,
+    String? tooltip,
+  }) =>
+      AppIconButton(
+        icon: icon,
+        onPressed: onPressed,
+        variant: AppIconButtonVariant.delete,
+        size: size,
+        iconSize: iconSize,
+        tooltip: tooltip,
+      );
+
+  factory AppIconButton.edit({
+    required IconData icon,
+    VoidCallback? onPressed,
+    double size = 44,
+    double iconSize = 22,
+    String? tooltip,
+  }) =>
+      AppIconButton(
+        icon: icon,
+        onPressed: onPressed,
+        variant: AppIconButtonVariant.edit,
+        size: size,
+        iconSize: iconSize,
+        tooltip: tooltip,
+      );
+
+  factory AppIconButton.glass({
+    required IconData icon,
+    VoidCallback? onPressed,
+    double size = 44,
+    double iconSize = 22,
+    String? tooltip,
+  }) =>
+      AppIconButton(
+        icon: icon,
+        onPressed: onPressed,
+        variant: AppIconButtonVariant.glass,
+        size: size,
+        iconSize: iconSize,
+        tooltip: tooltip,
+      );
+
+  factory AppIconButton.neon({
+    required IconData icon,
+    VoidCallback? onPressed,
+    double size = 44,
+    double iconSize = 22,
+    String? tooltip,
+  }) =>
+      AppIconButton(
+        icon: icon,
+        onPressed: onPressed,
+        variant: AppIconButtonVariant.neon,
+        size: size,
+        iconSize: iconSize,
+        tooltip: tooltip,
+      );
+
+  factory AppIconButton.scan({
+    required IconData icon,
+    VoidCallback? onPressed,
+    double size = 44,
+    double iconSize = 22,
+    String? tooltip,
+  }) =>
+      AppIconButton(
+        icon: icon,
+        onPressed: onPressed,
+        variant: AppIconButtonVariant.scan,
         size: size,
         iconSize: iconSize,
         tooltip: tooltip,
@@ -276,17 +357,14 @@ class AppIconButton extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: isDisabled ? null : onPressed,
-          borderRadius:
-              BorderRadius.circular(isCircle ? size / 2 : 12),
+          borderRadius: BorderRadius.circular(isCircle ? size / 2 : 12),
           child: Container(
             width: size,
             height: size,
             decoration: BoxDecoration(
               color: bgColor,
               shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
-              borderRadius: isCircle
-                  ? null
-                  : BorderRadius.circular(12),
+              borderRadius: isCircle ? null : BorderRadius.circular(12),
               border: variant == AppIconButtonVariant.glass
                   ? Border.all(
                       color: colors.border.withValues(alpha: 0.5),
@@ -338,83 +416,19 @@ class AppIconButton extends StatelessWidget {
   }
 }
 
-class AppTextButton extends StatelessWidget {
-  final String text;
-  final VoidCallback? onPressed;
-  final Color? color;
-  final double fontSize;
-  final FontWeight fontWeight;
-  final IconData? leadingIcon;
-
-  const AppTextButton({
-    super.key,
-    required this.text,
-    this.onPressed,
-    this.color,
-    this.fontSize = 14,
-    this.fontWeight = FontWeight.w600,
-    this.leadingIcon,
-  });
-
-  factory AppTextButton.danger({
-    required String text,
-    VoidCallback? onPressed,
-    IconData? leadingIcon,
-  }) =>
-      _DangerTextButton(
-          text: text, onPressed: onPressed, leadingIcon: leadingIcon);
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final effectiveColor = color ?? colors.primary;
-
-    return TextButton(
-      onPressed: onPressed,
-      style: TextButton.styleFrom(
-        foregroundColor: effectiveColor,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        minimumSize: Size.zero,
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (leadingIcon != null) ...[
-            Icon(leadingIcon, size: 16, color: effectiveColor),
-            const SizedBox(width: 4),
-          ],
-          Text(
-            text,
-            style: TextStyle(
-              color: effectiveColor,
-              fontSize: fontSize,
-              fontWeight: fontWeight,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DangerTextButton extends AppTextButton {
-  const _DangerTextButton({
-    required super.text,
-    super.onPressed,
-    super.leadingIcon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    return AppTextButton(
-      text: text,
-      onPressed: onPressed,
-      color: colors.neonRed,
-      leadingIcon: leadingIcon,
-    );
-  }
+enum AppIconButtonVariant {
+  standard,
+  neon,
+  glass,
+  danger,
+  check,
+  close,
+  delete,
+  add,
+  edit,
+  scan,
+  connect,
+  copy
 }
 
 class AppOutlineButton extends StatelessWidget {
@@ -515,6 +529,120 @@ class AppOutlineButton extends StatelessWidget {
   }
 }
 
+class AppTextButton extends StatelessWidget {
+  final String text;
+  final VoidCallback? onPressed;
+  final Color? color;
+  final double fontSize;
+  final FontWeight fontWeight;
+  final IconData? leadingIcon;
+
+  const AppTextButton({
+    super.key,
+    required this.text,
+    this.onPressed,
+    this.color,
+    this.fontSize = 14,
+    this.fontWeight = FontWeight.w600,
+    this.leadingIcon,
+  });
+
+  factory AppTextButton.danger({
+    required String text,
+    VoidCallback? onPressed,
+    IconData? leadingIcon,
+  }) =>
+      _DangerTextButton(
+          text: text, onPressed: onPressed, leadingIcon: leadingIcon);
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final effectiveColor = color ?? colors.primary;
+
+    return TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        foregroundColor: effectiveColor,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (leadingIcon != null) ...[
+            Icon(leadingIcon, size: 16, color: effectiveColor),
+            const SizedBox(width: 4),
+          ],
+          Text(
+            text,
+            style: TextStyle(
+              color: effectiveColor,
+              fontSize: fontSize,
+              fontWeight: fontWeight,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SmallButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  final bool isLoading;
+  final IconData? icon;
+  final double width;
+  final double height;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+  const SmallButton({
+    super.key,
+    required this.onTap,
+    this.isLoading = false,
+    this.icon,
+    this.width = 48,
+    this.height = 42,
+    this.backgroundColor,
+    this.foregroundColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return SizedBox(
+        width: width,
+        height: height,
+        child: ElevatedButton(
+          onPressed: isLoading ? null : onTap,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: backgroundColor ?? colors.neonGreen,
+            foregroundColor: foregroundColor ?? colors.surface,
+            padding: EdgeInsets.zero,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: isLoading
+              ? SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      colors.surface,
+                    ),
+                  ),
+                )
+              : icon != null
+                  ? Icon(icon, size: 18)
+                  : const Icon(Icons.send, size: 18),
+        ));
+  }
+}
+
 class _DangerOutlineButton extends AppOutlineButton {
   const _DangerOutlineButton({
     required super.text,
@@ -539,86 +667,21 @@ class _DangerOutlineButton extends AppOutlineButton {
   }
 }
 
-class AppFAB extends StatelessWidget {
-  final IconData icon;
-  final String? label;
-  final VoidCallback? onPressed;
-  final bool isPulseEnabled;
-  final bool isExtended;
-  final Color? color;
-
-  const AppFAB({
-    super.key,
-    required this.icon,
-    this.label,
-    this.onPressed,
-    this.isPulseEnabled = false,
-    this.isExtended = false,
-    this.color,
+class _DangerTextButton extends AppTextButton {
+  const _DangerTextButton({
+    required super.text,
+    super.onPressed,
+    super.leadingIcon,
   });
-
-  factory AppFAB.extended({
-    required IconData icon,
-    required String label,
-    VoidCallback? onPressed,
-    bool isPulseEnabled = false,
-    Color? color,
-  }) =>
-      AppFAB(
-        icon: icon,
-        label: label,
-        onPressed: onPressed,
-        isPulseEnabled: isPulseEnabled,
-        isExtended: true,
-        color: color,
-      );
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final bgColor = color ?? colors.primary;
-
-    Widget fab = isExtended
-        ? FloatingActionButton.extended(
-            onPressed: onPressed,
-            backgroundColor: bgColor,
-            foregroundColor: Colors.white,
-            icon: Icon(icon),
-            label: Text(
-              label ?? '',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-          )
-        : FloatingActionButton(
-            onPressed: onPressed,
-            backgroundColor: bgColor,
-            foregroundColor: Colors.white,
-            child: Icon(icon),
-          );
-
-    if (isPulseEnabled) {
-      fab = fab
-          .animate(onPlay: (c) => c.repeat(reverse: true))
-          .scaleXY(
-            begin: 1.0,
-            end: 1.05,
-            duration: 900.ms,
-            curve: Curves.easeInOut,
-          )
-          .boxShadow(
-            begin: BoxShadow(
-              color: bgColor.withValues(alpha: 0.3),
-              blurRadius: 8,
-            ),
-            end: BoxShadow(
-              color: bgColor.withValues(alpha: 0.7),
-              blurRadius: 24,
-              spreadRadius: 4,
-            ),
-            duration: 900.ms,
-          );
-    }
-
-    return fab;
+    return AppTextButton(
+      text: text,
+      onPressed: onPressed,
+      color: colors.neonRed,
+      leadingIcon: leadingIcon,
+    );
   }
 }
