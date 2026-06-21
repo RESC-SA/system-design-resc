@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/theme_extensions.dart';
+import '../../theme/theme_extensions.dart';
 
 class AppSegmentedField<T extends Object> extends StatelessWidget {
   final String? label;

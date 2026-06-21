@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-import '../theme/theme_extensions.dart';
+import '../../theme/theme_extensions.dart';
 import 'text_direction_extension.dart';
 
 class AppSearchField extends StatefulWidget {

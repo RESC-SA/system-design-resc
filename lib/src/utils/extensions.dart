@@ -279,6 +279,16 @@ extension WidgetX on Widget {
           .slideY(begin: begin.dy, duration: duration ?? const Duration(milliseconds: 400))
           .fadeIn(duration: duration ?? const Duration(milliseconds: 400));
   Widget then(Widget Function() next) => Column(children: [this, next()]);
+  Widget fadeOut({Duration? duration}) =>
+      this.animate().fadeOut(duration: duration ?? const Duration(milliseconds: 400));
+  Widget get visible => this;
+  Widget get hidden => this;
+  Widget padDir(double v) => Padding(padding: EdgeInsetsDirectional.all(v), child: this);
+  Widget padDirOnly({double start = 0, double end = 0}) =>
+      Padding(padding: EdgeInsetsDirectional.only(start: start, end: end), child: this);
+  Widget padDirSym({double start = 0, double end = 0}) =>
+      Padding(padding: EdgeInsetsDirectional.symmetric(horizontal: start, vertical: end), child: this);
+
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

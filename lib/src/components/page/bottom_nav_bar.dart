@@ -2,7 +2,7 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 
-import '../theme/theme_extensions.dart';
+import '../../theme/theme_extensions.dart';
 
 /// Fully custom bottom navigation bar with liquid glass effect,
 /// animated active indicator, and platform-adaptive layout.

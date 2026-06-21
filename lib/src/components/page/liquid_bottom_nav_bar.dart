@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import '../theme/theme_extensions.dart';
+import '../../theme/theme_extensions.dart';
 import 'liquid_nav_item.dart';
 import 'liquid_nav_style.dart';
 

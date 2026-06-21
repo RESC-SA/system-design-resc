@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/theme_extensions.dart';
+import '../../theme/theme_extensions.dart';
 
 class AppSliderField extends StatelessWidget {
   final String label;

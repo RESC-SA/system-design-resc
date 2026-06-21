@@ -9,6 +9,7 @@ import 'lists_page.dart';
 import 'scaffolds_page.dart';
 import 'feedback_page.dart';
 import 'cards_page.dart';
+import 'navigation_page.dart';
 
 class HomePage extends StatelessWidget {
   final VoidCallback onToggleTheme;
@@ -75,6 +76,13 @@ class HomePage extends StatelessWidget {
         desc: 'Dialogs, BottomSheets, SnackBars, AppText',
         color: context.colors.neonOrange,
         page: const FeedbackPage(),
+      ),
+      _Section(
+        icon: Amicons.lucide_waves,
+        label: 'Navigation',
+        desc: 'LiquidBottomNavBar with physics-based blob animation',
+        color: context.colors.neonCyan,
+        page: const NavigationPage(),
       ),
     ];
 
