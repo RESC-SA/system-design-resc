@@ -10,6 +10,10 @@ class GlassContainer extends StatelessWidget {
   final double border;
   final EdgeInsetsGeometry? padding;
   final double sigma;
+  final Color? backgroundColor;
+  final bool isGlass;
+  final bool? isBorder;
+  final List<BoxShadow>? boxShadow;
 
   const GlassContainer({
     super.key,
@@ -20,6 +24,10 @@ class GlassContainer extends StatelessWidget {
     this.border = 1,
     this.padding,
     this.sigma = 8,
+    this.backgroundColor,
+    this.boxShadow,
+    this.isGlass = true,
+    this.isBorder = true,
   });
 
   @override
@@ -30,22 +38,35 @@ class GlassContainer extends StatelessWidget {
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
-      child: BackdropFilter(
+      child: isGlass ? BackdropFilter(
         filter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
         child: Container(
           width: width,
           height: height,
           decoration: BoxDecoration(
-            color: tint,
+            color: backgroundColor ?? tint,
             borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(color: borderColor, width: border),
+            border: isBorder ?? true ? Border.all(color: borderColor, width: border) : null,
           ),
           child: Padding(
             padding: padding ?? EdgeInsets.zero,
             child: child,
           ),
         ),
-      ),
+      ) : Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: backgroundColor ?? tint,
+          borderRadius: BorderRadius.circular(borderRadius),
+          border: isBorder ?? true ? Border.all(color: borderColor, width: border) : null,
+          boxShadow: boxShadow ?? [],
+        ),
+        child: Padding(
+          padding: padding ?? EdgeInsets.zero,
+          child: child,
+        ),
+      )
     );
   }
 }
