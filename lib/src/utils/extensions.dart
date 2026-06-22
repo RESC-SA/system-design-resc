@@ -8,6 +8,10 @@ import 'package:flutter_animate/flutter_animate.dart';
 extension ContextX on BuildContext {
   ThemeData get theme => Theme.of(this);
   MediaQueryData get mq => MediaQuery.of(this);
+  Size get screenSize => mq.size;
+  Size get mediaQuery => MediaQuery.sizeOf(this);
+  double get widthSize => mediaQuery.width;
+  double get heightSize => mediaQuery.height;
   bool get isDarkMode => theme.brightness == Brightness.dark;
   bool get isLightMode => theme.brightness == Brightness.light;
   double get screenWidth => mq.size.width;
