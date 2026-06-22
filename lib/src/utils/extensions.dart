@@ -123,11 +123,6 @@ extension NumX on num {
   Widget get asIcon => Icon(null);
   Widget get hGap => SizedBox(width: toDouble());
   Widget get vGap => SizedBox(height: toDouble());
-  Duration get seconds => Duration(seconds: toInt());
-  Duration get minutes => Duration(minutes: toInt());
-  Duration get hours => Duration(hours: toInt());
-  Duration get days => Duration(days: toInt());
-  Duration get milliseconds => Duration(milliseconds: toInt());
   bool isBetween(num a, num b) => this >= a && this <= b;
 }
 
@@ -349,4 +344,13 @@ extension PlatformX on BuildContext {
   bool get isMacOS => Theme.of(this).platform == TargetPlatform.macOS;
   bool get isWindows => Theme.of(this).platform == TargetPlatform.windows;
   bool get isFuchsia => Theme.of(this).platform == TargetPlatform.fuchsia;
+}
+extension TimeFixed on num {
+  Duration get microsecondsApp => Duration(microseconds: round());
+  Duration get msApp => TimeFixed(this * 1000).microsecondsApp;
+  Duration get millisecondsApp => TimeFixed(this * 1000).microsecondsApp;
+  Duration get secondsApp => TimeFixed(this * 1000 * 1000).microsecondsApp;
+  Duration get minutesApp => TimeFixed(this * 1000 * 1000 * 60).microsecondsApp;
+  Duration get hoursApp => TimeFixed(this * 1000 * 1000 * 60 * 60).microsecondsApp;
+  Duration get daysApp => TimeFixed(this * 1000 * 1000 * 60 * 60 * 24).microsecondsApp;
 }
