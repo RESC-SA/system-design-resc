@@ -21,7 +21,8 @@ class LiquidBottomNavBar extends StatefulWidget {
     required this.currentIndex,
     required this.items,
     this.onTap,
-    this.onChanged,
+    this.onChanged, 
+    this.color,
     this.onDrag,
     this.badges,
     this.style = const LiquidNavStyle(),
@@ -92,6 +93,7 @@ class LiquidBottomNavBar extends StatefulWidget {
   final double height;
   final double? width;
   final double iconSize;
+  final Color? color;
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry margin;
 
@@ -426,7 +428,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                           Icon(
                                             iconData,
                                             size: widget.iconSize,
-                                            color: Color.lerp(
+                                            color: widget.color ?? Color.lerp(
                                               style.inactiveIconColor,
                                               style.activeIconColor,
                                               (1.0 - distance).clamp(0.0, 1.0),
