@@ -9,6 +9,8 @@ class LiquidNavItem {
     this.inactiveIcon,
     this.label,
     this.semanticLabel,
+    this.colorIconNavBar,
+    this.labelStyle,
   });
 
   final IconData icon;
@@ -16,4 +18,6 @@ class LiquidNavItem {
   final IconData? inactiveIcon;
   final String? label;
   final String? semanticLabel;
+  final Color? colorIconNavBar;
+  final TextStyle? labelStyle;
 }
