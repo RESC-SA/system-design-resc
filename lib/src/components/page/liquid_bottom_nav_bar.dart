@@ -90,7 +90,6 @@ class LiquidBottomNavBar extends StatefulWidget {
   final double dragWaveHeightMultiplier;
   final double dragWavePositionMultiplier;
   final bool showBorder;
-  final GlobalKey<_LiquidBottomNavBarState>? navKey;
   const LiquidBottomNavBar({
     super.key,
     required this.currentIndex,
@@ -145,7 +144,6 @@ class LiquidBottomNavBar extends StatefulWidget {
     this.dragWaveHeightMultiplier = 3.5,
     this.dragWavePositionMultiplier = 1.4,
     this.showBorder = true,
-    this.navKey,
   })  : assert(items.length >= 2, 'items must contain at least 2 entries'),
         assert(onTap != null || onChanged != null,
             'Provide onTap or onChanged callback');
