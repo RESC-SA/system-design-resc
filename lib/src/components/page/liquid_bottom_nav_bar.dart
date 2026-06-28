@@ -89,6 +89,8 @@ class LiquidBottomNavBar extends StatefulWidget {
   final double gradientPrimaryAlpha2;
   final double dragWaveHeightMultiplier;
   final double dragWavePositionMultiplier;
+  final bool showBorder;
+  final GlobalKey<_LiquidBottomNavBarState>? navKey;
   const LiquidBottomNavBar({
     super.key,
     required this.currentIndex,
@@ -142,6 +144,8 @@ class LiquidBottomNavBar extends StatefulWidget {
     this.gradientPrimaryAlpha2 = 0.45,
     this.dragWaveHeightMultiplier = 3.5,
     this.dragWavePositionMultiplier = 1.4,
+    this.showBorder = true,
+    this.navKey,
   })  : assert(items.length >= 2, 'items must contain at least 2 entries'),
         assert(onTap != null || onChanged != null,
             'Provide onTap or onChanged callback');
@@ -179,6 +183,7 @@ class _IOSLiquidPainter extends CustomPainter {
   final double gradientPrimaryAlpha2;
   final double dragWaveHeightMultiplier;
   final double dragWavePositionMultiplier;
+  final bool showBorder;
   _IOSLiquidPainter({
     required this.position,
     required this.itemWidth,
@@ -207,6 +212,7 @@ class _IOSLiquidPainter extends CustomPainter {
     required this.gradientPrimaryAlpha2,
     required this.dragWaveHeightMultiplier,
     required this.dragWavePositionMultiplier,
+    required this.showBorder,
   });
 
   @override
@@ -262,13 +268,15 @@ class _IOSLiquidPainter extends CustomPainter {
 
     canvas.drawRRect(rrect, liquidPaint);
 
-    canvas.drawRRect(
-      rrect,
-      Paint()
-        ..color = surfaceColor.withValues(alpha: borderAlpha)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = borderWidth,
-    );
+    if (showBorder) {
+      canvas.drawRRect(
+        rrect,
+        Paint()
+          ..color = surfaceColor.withValues(alpha: borderAlpha)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = borderWidth,
+      );
+    }
   }
 
   @override
@@ -300,7 +308,8 @@ class _IOSLiquidPainter extends CustomPainter {
         oldDelegate.gradientPrimaryAlpha1 != gradientPrimaryAlpha1 ||
         oldDelegate.gradientPrimaryAlpha2 != gradientPrimaryAlpha2 ||
         oldDelegate.dragWaveHeightMultiplier != dragWaveHeightMultiplier ||
-        oldDelegate.dragWavePositionMultiplier != dragWavePositionMultiplier;
+        oldDelegate.dragWavePositionMultiplier != dragWavePositionMultiplier ||
+        oldDelegate.showBorder != showBorder;
   }
 }
 
@@ -310,6 +319,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
   late final AnimationController _snapController;
   late final AnimationController _wobbleController;
   late final AnimationController _dragWobbleController;
+  late final AnimationController _visualController;
 
   double _dragPosition = 0;
   bool _isDragging = false;
@@ -317,6 +327,72 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
   double? _snapTarget;
   Animation<double>? _currentAnimation;
   VoidCallback? _snapListener;
+
+  // Animated visual property values
+  double _animatedShadowOffset = 3;
+  double _animatedShadowAlpha = 0.15;
+  double _animatedShadowBlurSigma = 10;
+  double _animatedBorderAlpha = 0.8;
+  double _animatedBorderWidth = 1.2;
+  double _animatedGradientSurfaceAlpha = 0.95;
+  double _animatedGradientPrimaryAlpha1 = 0.18;
+  double _animatedGradientPrimaryAlpha2 = 0.45;
+  double _animatedDragWaveHeightMultiplier = 3.5;
+  double _animatedDragWavePositionMultiplier = 1.4;
+  double _animatedBlobWobbleInfluenceOnWidth = 1;
+  double _animatedBlobWobbleInfluenceOnHeight = 0.3;
+
+  // Target values for animation
+  double? _targetShadowOffset;
+  double? _targetShadowAlpha;
+  double? _targetShadowBlurSigma;
+  double? _targetBorderAlpha;
+  double? _targetBorderWidth;
+  double? _targetGradientSurfaceAlpha;
+  double? _targetGradientPrimaryAlpha1;
+  double? _targetGradientPrimaryAlpha2;
+  double? _targetDragWaveHeightMultiplier;
+  double? _targetDragWavePositionMultiplier;
+  double? _targetBlobWobbleInfluenceOnWidth;
+  double? _targetBlobWobbleInfluenceOnHeight;
+
+  void animateVisualProperties({
+    double? shadowOffset,
+    double? shadowAlpha,
+    double? shadowBlurSigma,
+    double? borderAlpha,
+    double? borderWidth,
+    double? gradientSurfaceAlpha,
+    double? gradientPrimaryAlpha1,
+    double? gradientPrimaryAlpha2,
+    double? dragWaveHeightMultiplier,
+    double? dragWavePositionMultiplier,
+    double? blobWobbleInfluenceOnWidth,
+    double? blobWobbleInfluenceOnHeight,
+  }) {
+    if (shadowOffset != null) _targetShadowOffset = shadowOffset;
+    if (shadowAlpha != null) _targetShadowAlpha = shadowAlpha;
+    if (shadowBlurSigma != null) _targetShadowBlurSigma = shadowBlurSigma;
+    if (borderAlpha != null) _targetBorderAlpha = borderAlpha;
+    if (borderWidth != null) _targetBorderWidth = borderWidth;
+    if (gradientSurfaceAlpha != null)
+      _targetGradientSurfaceAlpha = gradientSurfaceAlpha;
+    if (gradientPrimaryAlpha1 != null)
+      _targetGradientPrimaryAlpha1 = gradientPrimaryAlpha1;
+    if (gradientPrimaryAlpha2 != null)
+      _targetGradientPrimaryAlpha2 = gradientPrimaryAlpha2;
+    if (dragWaveHeightMultiplier != null)
+      _targetDragWaveHeightMultiplier = dragWaveHeightMultiplier;
+    if (dragWavePositionMultiplier != null)
+      _targetDragWavePositionMultiplier = dragWavePositionMultiplier;
+    if (blobWobbleInfluenceOnWidth != null)
+      _targetBlobWobbleInfluenceOnWidth = blobWobbleInfluenceOnWidth;
+    if (blobWobbleInfluenceOnHeight != null)
+      _targetBlobWobbleInfluenceOnHeight = blobWobbleInfluenceOnHeight;
+
+    _visualController.stop();
+    _visualController.forward(from: 0);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -427,6 +503,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                               _snapController,
                               _wobbleController,
                               _dragWobbleController,
+                              _visualController,
                             ]),
                             builder: (context, _) {
                               final wobbleVal = math.sin(
@@ -456,24 +533,25 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                       widget.blobStretchMultiplier,
                                   blobMaxStretch: widget.blobMaxStretch,
                                   blobWobbleInfluenceOnWidth:
-                                      widget.blobWobbleInfluenceOnWidth,
+                                      _animatedBlobWobbleInfluenceOnWidth,
                                   blobWobbleInfluenceOnHeight:
-                                      widget.blobWobbleInfluenceOnHeight,
-                                  shadowOffset: widget.shadowOffset,
-                                  shadowAlpha: widget.shadowAlpha,
-                                  shadowBlurSigma: widget.shadowBlurSigma,
-                                  borderAlpha: widget.borderAlpha,
-                                  borderWidth: widget.borderWidth,
+                                      _animatedBlobWobbleInfluenceOnHeight,
+                                  shadowOffset: _animatedShadowOffset,
+                                  shadowAlpha: _animatedShadowAlpha,
+                                  shadowBlurSigma: _animatedShadowBlurSigma,
+                                  borderAlpha: _animatedBorderAlpha,
+                                  borderWidth: _animatedBorderWidth,
                                   gradientSurfaceAlpha:
-                                      widget.gradientSurfaceAlpha,
+                                      _animatedGradientSurfaceAlpha,
                                   gradientPrimaryAlpha1:
-                                      widget.gradientPrimaryAlpha1,
+                                      _animatedGradientPrimaryAlpha1,
                                   gradientPrimaryAlpha2:
-                                      widget.gradientPrimaryAlpha2,
+                                      _animatedGradientPrimaryAlpha2,
                                   dragWaveHeightMultiplier:
-                                      widget.dragWaveHeightMultiplier,
+                                      _animatedDragWaveHeightMultiplier,
                                   dragWavePositionMultiplier:
-                                      widget.dragWavePositionMultiplier,
+                                      _animatedDragWavePositionMultiplier,
+                                  showBorder: widget.showBorder,
                                 ),
                               );
                             },
@@ -630,6 +708,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
     _snapController.dispose();
     _wobbleController.dispose();
     _dragWobbleController.dispose();
+    _visualController.dispose();
     super.dispose();
   }
 
@@ -652,6 +731,12 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
       vsync: this,
       duration: const Duration(milliseconds: 900),
     );
+    _visualController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+
+    _visualController.addListener(_updateVisualValues);
   }
 
   void _animateTo(int index) {
@@ -721,5 +806,89 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
     if (mounted) {
       _wobbleController.forward(from: 0);
     }
+  }
+
+  void _updateVisualValues() {
+    if (!mounted) return;
+    setState(() {
+      _animatedShadowOffset = lerpDouble(
+            _animatedShadowOffset,
+            _targetShadowOffset ?? widget.shadowOffset,
+            _visualController.value,
+          ) ??
+          (_targetShadowOffset ?? widget.shadowOffset);
+      _animatedShadowAlpha = lerpDouble(
+            _animatedShadowAlpha,
+            _targetShadowAlpha ?? widget.shadowAlpha,
+            _visualController.value,
+          ) ??
+          (_targetShadowAlpha ?? widget.shadowAlpha);
+      _animatedShadowBlurSigma = lerpDouble(
+            _animatedShadowBlurSigma,
+            _targetShadowBlurSigma ?? widget.shadowBlurSigma,
+            _visualController.value,
+          ) ??
+          (_targetShadowBlurSigma ?? widget.shadowBlurSigma);
+      _animatedBorderAlpha = lerpDouble(
+            _animatedBorderAlpha,
+            _targetBorderAlpha ?? widget.borderAlpha,
+            _visualController.value,
+          ) ??
+          (_targetBorderAlpha ?? widget.borderAlpha);
+      _animatedBorderWidth = lerpDouble(
+            _animatedBorderWidth,
+            _targetBorderWidth ?? widget.borderWidth,
+            _visualController.value,
+          ) ??
+          (_targetBorderWidth ?? widget.borderWidth);
+      _animatedGradientSurfaceAlpha = lerpDouble(
+            _animatedGradientSurfaceAlpha,
+            _targetGradientSurfaceAlpha ?? widget.gradientSurfaceAlpha,
+            _visualController.value,
+          ) ??
+          (_targetGradientSurfaceAlpha ?? widget.gradientSurfaceAlpha);
+      _animatedGradientPrimaryAlpha1 = lerpDouble(
+            _animatedGradientPrimaryAlpha1,
+            _targetGradientPrimaryAlpha1 ?? widget.gradientPrimaryAlpha1,
+            _visualController.value,
+          ) ??
+          (_targetGradientPrimaryAlpha1 ?? widget.gradientPrimaryAlpha1);
+      _animatedGradientPrimaryAlpha2 = lerpDouble(
+            _animatedGradientPrimaryAlpha2,
+            _targetGradientPrimaryAlpha2 ?? widget.gradientPrimaryAlpha2,
+            _visualController.value,
+          ) ??
+          (_targetGradientPrimaryAlpha2 ?? widget.gradientPrimaryAlpha2);
+      _animatedDragWaveHeightMultiplier = lerpDouble(
+            _animatedDragWaveHeightMultiplier,
+            _targetDragWaveHeightMultiplier ?? widget.dragWaveHeightMultiplier,
+            _visualController.value,
+          ) ??
+          (_targetDragWaveHeightMultiplier ?? widget.dragWaveHeightMultiplier);
+      _animatedDragWavePositionMultiplier = lerpDouble(
+            _animatedDragWavePositionMultiplier,
+            _targetDragWavePositionMultiplier ??
+                widget.dragWavePositionMultiplier,
+            _visualController.value,
+          ) ??
+          (_targetDragWavePositionMultiplier ??
+              widget.dragWavePositionMultiplier);
+      _animatedBlobWobbleInfluenceOnWidth = lerpDouble(
+            _animatedBlobWobbleInfluenceOnWidth,
+            _targetBlobWobbleInfluenceOnWidth ??
+                widget.blobWobbleInfluenceOnWidth,
+            _visualController.value,
+          ) ??
+          (_targetBlobWobbleInfluenceOnWidth ??
+              widget.blobWobbleInfluenceOnWidth);
+      _animatedBlobWobbleInfluenceOnHeight = lerpDouble(
+            _animatedBlobWobbleInfluenceOnHeight,
+            _targetBlobWobbleInfluenceOnHeight ??
+                widget.blobWobbleInfluenceOnHeight,
+            _visualController.value,
+          ) ??
+          (_targetBlobWobbleInfluenceOnHeight ??
+              widget.blobWobbleInfluenceOnHeight);
+    });
   }
 }
