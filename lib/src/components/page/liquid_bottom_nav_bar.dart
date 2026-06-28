@@ -16,6 +16,79 @@ typedef LiquidNavItemIconBuilder = IconData Function(LiquidNavItem item);
 /// deformation for a fluid, organic feel.
 @immutable
 class LiquidBottomNavBar extends StatefulWidget {
+  final int currentIndex;
+
+  final List<LiquidNavItem> items;
+
+  /// Preferred callback for tab selection.
+  final ValueChanged<int>? onTap;
+
+  /// Backward compatibility callback.
+  final ValueChanged<int>? onChanged;
+
+  /// Called when drag gesture ends at nearest tab.
+  final ValueChanged<int>? onDrag;
+
+  /// Optional badges map by index.
+  final Map<int, int>? badges;
+
+  final LiquidNavStyle style;
+
+  final Color? backgroundColor;
+
+  final Color? containerColor;
+  final Color? liquidColor;
+  final Color? activeIconColor;
+  final Color? inactiveIconColor;
+  final Border? border;
+  final BorderSide? borderSide;
+  final BorderRadiusGeometry? borderRadius;
+  final double height;
+
+  final double? width;
+  final double iconSize;
+  // final Color? color;
+  final EdgeInsetsGeometry padding;
+  final EdgeInsetsGeometry margin;
+  final Duration animationDuration;
+
+  final Curve curve;
+  final List<BoxShadow>? boxShadow;
+  final TextStyle? labelStyle;
+
+  final TextStyle? activeLabelStyle;
+  final bool? showLabel;
+  final LiquidNavItemIconBuilder? activeIcon;
+
+  final LiquidNavItemIconBuilder? inactiveIcon;
+
+  /// Optional blur (glass effect). Null or 0 disables.
+  final double? blurSigma;
+
+  final Color badgeColor;
+
+  final Color badgeTextColor;
+  final Color? badgeBorderColor;
+  final TextStyle? badgeTextStyle;
+  final double blobBaseWidthFactor;
+
+  final double blobExpandedWidthFactor;
+  final double blobBaseHeight;
+  final double blobExpandedHeight;
+  final double blobStretchMultiplier;
+  final double blobMaxStretch;
+  final double blobWobbleInfluenceOnWidth;
+  final double blobWobbleInfluenceOnHeight;
+  final double shadowOffset;
+  final double shadowAlpha;
+  final double shadowBlurSigma;
+  final double borderAlpha;
+  final double borderWidth;
+  final double gradientSurfaceAlpha;
+  final double gradientPrimaryAlpha1;
+  final double gradientPrimaryAlpha2;
+  final double dragWaveHeightMultiplier;
+  final double dragWavePositionMultiplier;
   const LiquidBottomNavBar({
     super.key,
     required this.currentIndex,
@@ -59,62 +132,35 @@ class LiquidBottomNavBar extends StatefulWidget {
     this.blobMaxStretch = 45,
     this.blobWobbleInfluenceOnWidth = 1,
     this.blobWobbleInfluenceOnHeight = 0.3,
+    this.shadowOffset = 3,
+    this.shadowAlpha = 0.15,
+    this.shadowBlurSigma = 10,
+    this.borderAlpha = 0.8,
+    this.borderWidth = 1.2,
+    this.gradientSurfaceAlpha = 0.95,
+    this.gradientPrimaryAlpha1 = 0.18,
+    this.gradientPrimaryAlpha2 = 0.45,
+    this.dragWaveHeightMultiplier = 3.5,
+    this.dragWavePositionMultiplier = 1.4,
   })  : assert(items.length >= 2, 'items must contain at least 2 entries'),
         assert(onTap != null || onChanged != null,
             'Provide onTap or onChanged callback');
 
-  final int currentIndex;
-  final List<LiquidNavItem> items;
+  @override
+  State<LiquidBottomNavBar> createState() => _LiquidBottomNavBarState();
+}
 
-  /// Preferred callback for tab selection.
-  final ValueChanged<int>? onTap;
+class _IOSLiquidPainter extends CustomPainter {
+  final double position;
 
-  /// Backward compatibility callback.
-  final ValueChanged<int>? onChanged;
-
-  /// Called when drag gesture ends at nearest tab.
-  final ValueChanged<int>? onDrag;
-
-  /// Optional badges map by index.
-  final Map<int, int>? badges;
-
-  final LiquidNavStyle style;
-
-  final Color? backgroundColor;
-  final Color? containerColor;
-  final Color? liquidColor;
-  final Color? activeIconColor;
-  final Color? inactiveIconColor;
-  final Border? border;
-  final BorderSide? borderSide;
-  final BorderRadiusGeometry? borderRadius;
-
-  final double height;
-  final double? width;
-  final double iconSize;
- // final Color? color;
-  final EdgeInsetsGeometry padding;
-  final EdgeInsetsGeometry margin;
-
-  final Duration animationDuration;
-  final Curve curve;
-  final List<BoxShadow>? boxShadow;
-
-  final TextStyle? labelStyle;
-  final TextStyle? activeLabelStyle;
-  final bool? showLabel;
-
-  final LiquidNavItemIconBuilder? activeIcon;
-  final LiquidNavItemIconBuilder? inactiveIcon;
-
-  /// Optional blur (glass effect). Null or 0 disables.
-  final double? blurSigma;
-
-  final Color badgeColor;
-  final Color badgeTextColor;
-  final Color? badgeBorderColor;
-  final TextStyle? badgeTextStyle;
-
+  final double itemWidth;
+  final double velocity;
+  final double expansion;
+  final double wobble;
+  final double dragWobble;
+  final double horizontalInset;
+  final Color primaryColor;
+  final Color surfaceColor;
   final double blobBaseWidthFactor;
   final double blobExpandedWidthFactor;
   final double blobBaseHeight;
@@ -123,9 +169,139 @@ class LiquidBottomNavBar extends StatefulWidget {
   final double blobMaxStretch;
   final double blobWobbleInfluenceOnWidth;
   final double blobWobbleInfluenceOnHeight;
+  final double shadowOffset;
+  final double shadowAlpha;
+  final double shadowBlurSigma;
+  final double borderAlpha;
+  final double borderWidth;
+  final double gradientSurfaceAlpha;
+  final double gradientPrimaryAlpha1;
+  final double gradientPrimaryAlpha2;
+  final double dragWaveHeightMultiplier;
+  final double dragWavePositionMultiplier;
+  _IOSLiquidPainter({
+    required this.position,
+    required this.itemWidth,
+    required this.velocity,
+    required this.expansion,
+    required this.wobble,
+    required this.dragWobble,
+    required this.horizontalInset,
+    required this.primaryColor,
+    required this.surfaceColor,
+    required this.blobBaseWidthFactor,
+    required this.blobExpandedWidthFactor,
+    required this.blobBaseHeight,
+    required this.blobExpandedHeight,
+    required this.blobStretchMultiplier,
+    required this.blobMaxStretch,
+    required this.blobWobbleInfluenceOnWidth,
+    required this.blobWobbleInfluenceOnHeight,
+    required this.shadowOffset,
+    required this.shadowAlpha,
+    required this.shadowBlurSigma,
+    required this.borderAlpha,
+    required this.borderWidth,
+    required this.gradientSurfaceAlpha,
+    required this.gradientPrimaryAlpha1,
+    required this.gradientPrimaryAlpha2,
+    required this.dragWaveHeightMultiplier,
+    required this.dragWavePositionMultiplier,
+  });
 
   @override
-  State<LiquidBottomNavBar> createState() => _LiquidBottomNavBarState();
+  void paint(Canvas canvas, Size size) {
+    final centerX = horizontalInset + (position * itemWidth) + (itemWidth / 2);
+
+    final baseWidth = itemWidth * blobBaseWidthFactor;
+    final expandedWidth = itemWidth * blobExpandedWidthFactor;
+    var currentWidth =
+        lerpDouble(baseWidth, expandedWidth, expansion) ?? baseWidth;
+
+    final stretch =
+        (velocity.abs() * blobStretchMultiplier).clamp(0.0, blobMaxStretch);
+    currentWidth += stretch + (wobble * blobWobbleInfluenceOnWidth);
+
+    final baseHeight = blobBaseHeight;
+    final expandedHeight = blobExpandedHeight;
+    var currentHeight =
+        lerpDouble(baseHeight, expandedHeight, expansion) ?? baseHeight;
+
+    currentHeight -= wobble * blobWobbleInfluenceOnHeight;
+    final dragWave =
+        math.sin(dragWobble * math.pi * 2) * velocity.abs().clamp(0.0, 1.0);
+    currentHeight += dragWave * dragWaveHeightMultiplier;
+
+    final rect = Rect.fromCenter(
+      center: Offset(
+          centerX, (size.height / 2) + (dragWave * dragWavePositionMultiplier)),
+      width: currentWidth,
+      height: currentHeight,
+    );
+
+    final rrect =
+        RRect.fromRectAndRadius(rect, Radius.circular(currentHeight / 2));
+
+    final liquidPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          surfaceColor.withValues(alpha: gradientSurfaceAlpha),
+          primaryColor.withValues(alpha: gradientPrimaryAlpha1),
+          primaryColor.withValues(alpha: gradientPrimaryAlpha2),
+        ],
+      ).createShader(rect);
+
+    canvas.drawRRect(
+      rrect.shift(Offset(0, shadowOffset)),
+      Paint()
+        ..color = primaryColor.withValues(alpha: shadowAlpha)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, shadowBlurSigma),
+    );
+
+    canvas.drawRRect(rrect, liquidPaint);
+
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..color = surfaceColor.withValues(alpha: borderAlpha)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = borderWidth,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _IOSLiquidPainter oldDelegate) {
+    return oldDelegate.position != position ||
+        oldDelegate.itemWidth != itemWidth ||
+        oldDelegate.velocity != velocity ||
+        oldDelegate.expansion != expansion ||
+        oldDelegate.wobble != wobble ||
+        oldDelegate.dragWobble != dragWobble ||
+        oldDelegate.horizontalInset != horizontalInset ||
+        oldDelegate.primaryColor != primaryColor ||
+        oldDelegate.surfaceColor != surfaceColor ||
+        oldDelegate.blobBaseWidthFactor != blobBaseWidthFactor ||
+        oldDelegate.blobExpandedWidthFactor != blobExpandedWidthFactor ||
+        oldDelegate.blobBaseHeight != blobBaseHeight ||
+        oldDelegate.blobExpandedHeight != blobExpandedHeight ||
+        oldDelegate.blobStretchMultiplier != blobStretchMultiplier ||
+        oldDelegate.blobMaxStretch != blobMaxStretch ||
+        oldDelegate.blobWobbleInfluenceOnWidth != blobWobbleInfluenceOnWidth ||
+        oldDelegate.blobWobbleInfluenceOnHeight !=
+            blobWobbleInfluenceOnHeight ||
+        oldDelegate.shadowOffset != shadowOffset ||
+        oldDelegate.shadowAlpha != shadowAlpha ||
+        oldDelegate.shadowBlurSigma != shadowBlurSigma ||
+        oldDelegate.borderAlpha != borderAlpha ||
+        oldDelegate.borderWidth != borderWidth ||
+        oldDelegate.gradientSurfaceAlpha != gradientSurfaceAlpha ||
+        oldDelegate.gradientPrimaryAlpha1 != gradientPrimaryAlpha1 ||
+        oldDelegate.gradientPrimaryAlpha2 != gradientPrimaryAlpha2 ||
+        oldDelegate.dragWaveHeightMultiplier != dragWaveHeightMultiplier ||
+        oldDelegate.dragWavePositionMultiplier != dragWavePositionMultiplier;
+  }
 }
 
 class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
@@ -141,111 +317,6 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
   double? _snapTarget;
   Animation<double>? _currentAnimation;
   VoidCallback? _snapListener;
-
-  @override
-  void initState() {
-    super.initState();
-    _dragPosition = widget.currentIndex.toDouble();
-
-    _expansionController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 150),
-    );
-    _snapController =
-        AnimationController(vsync: this, duration: widget.animationDuration);
-    _wobbleController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _dragWobbleController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-  }
-
-  @override
-  void didUpdateWidget(covariant LiquidBottomNavBar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.animationDuration != widget.animationDuration) {
-      _snapController.duration = widget.animationDuration;
-    }
-
-    if (oldWidget.currentIndex != widget.currentIndex && !_isDragging) {
-      if (_snapTarget == widget.currentIndex.toDouble()) {
-        return;
-      }
-      _animateTo(widget.currentIndex);
-    }
-  }
-
-  void _selectIndex(int index) {
-    widget.onTap?.call(index);
-    widget.onChanged?.call(index);
-  }
-
-  void _animateTo(int index) {
-    final clampedIndex = index.clamp(0, widget.items.length - 1);
-    final target = clampedIndex.toDouble();
-    _removeSnapListener();
-
-    if (_dragPosition == target) {
-      _wobbleController.forward(from: 0);
-      return;
-    }
-
-    _snapController.stop();
-    _wobbleController.stop();
-    _snapTarget = target;
-
-    final animation = Tween<double>(begin: _dragPosition, end: target).animate(
-      CurvedAnimation(parent: _snapController, curve: widget.curve),
-    );
-
-    _currentAnimation = animation;
-
-    void listener() {
-      if (_currentAnimation == animation && mounted) {
-        setState(() {
-          _dragPosition = animation.value;
-        });
-      }
-    }
-
-    _snapListener = listener;
-    animation.addListener(listener);
-    _snapController.addStatusListener(_snapStatusListener);
-    _snapController.forward(from: 0);
-  }
-
-  void _snapStatusListener(AnimationStatus status) {
-    if (status != AnimationStatus.completed) return;
-    _removeSnapListener();
-    _snapTarget = null;
-    if (mounted) {
-      _wobbleController.forward(from: 0);
-    }
-  }
-
-  void _removeSnapListener() {
-    final listener = _snapListener;
-    final animation = _currentAnimation;
-    if (listener != null && animation != null) {
-      animation.removeListener(listener);
-    }
-    _snapListener = null;
-    _snapController.removeStatusListener(_snapStatusListener);
-  }
-
-  @override
-  void dispose() {
-    _removeSnapListener();
-    _expansionController.dispose();
-    _snapController.dispose();
-    _wobbleController.dispose();
-    _dragWobbleController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -380,8 +451,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                   blobExpandedWidthFactor:
                                       widget.blobExpandedWidthFactor,
                                   blobBaseHeight: widget.blobBaseHeight,
-                                  blobExpandedHeight:
-                                      widget.blobExpandedHeight,
+                                  blobExpandedHeight: widget.blobExpandedHeight,
                                   blobStretchMultiplier:
                                       widget.blobStretchMultiplier,
                                   blobMaxStretch: widget.blobMaxStretch,
@@ -389,6 +459,21 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                       widget.blobWobbleInfluenceOnWidth,
                                   blobWobbleInfluenceOnHeight:
                                       widget.blobWobbleInfluenceOnHeight,
+                                  shadowOffset: widget.shadowOffset,
+                                  shadowAlpha: widget.shadowAlpha,
+                                  shadowBlurSigma: widget.shadowBlurSigma,
+                                  borderAlpha: widget.borderAlpha,
+                                  borderWidth: widget.borderWidth,
+                                  gradientSurfaceAlpha:
+                                      widget.gradientSurfaceAlpha,
+                                  gradientPrimaryAlpha1:
+                                      widget.gradientPrimaryAlpha1,
+                                  gradientPrimaryAlpha2:
+                                      widget.gradientPrimaryAlpha2,
+                                  dragWaveHeightMultiplier:
+                                      widget.dragWaveHeightMultiplier,
+                                  dragWavePositionMultiplier:
+                                      widget.dragWavePositionMultiplier,
                                 ),
                               );
                             },
@@ -427,11 +512,14 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                           Icon(
                                             iconData,
                                             size: widget.iconSize,
-                                            color: widget.items[index].colorIconNavBar ?? Color.lerp(
-                                              style.inactiveIconColor,
-                                              style.activeIconColor,
-                                              (1.0 - distance).clamp(0.0, 1.0),
-                                            ),
+                                            color: widget.items[index]
+                                                    .colorIconNavBar ??
+                                                Color.lerp(
+                                                  style.inactiveIconColor,
+                                                  style.activeIconColor,
+                                                  (1.0 - distance)
+                                                      .clamp(0.0, 1.0),
+                                                ),
                                           ),
                                           if (_showBadge(index))
                                             Positioned(
@@ -482,7 +570,8 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                           child: Text(
                                             item.label!,
                                             style: isSelected
-                                                ? (item.labelStyle ?? style.activeLabelStyle ??
+                                                ? (item.labelStyle ??
+                                                    style.activeLabelStyle ??
                                                     TextStyle(
                                                       fontSize: 9,
                                                       fontWeight:
@@ -518,139 +607,119 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
     );
   }
 
-  bool _showBadge(int index) {
-    final badges = widget.badges;
-    if (badges == null || !badges.containsKey(index)) return false;
-    return (badges[index] ?? 0) > 0;
+  @override
+  void didUpdateWidget(covariant LiquidBottomNavBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.animationDuration != widget.animationDuration) {
+      _snapController.duration = widget.animationDuration;
+    }
+
+    if (oldWidget.currentIndex != widget.currentIndex && !_isDragging) {
+      if (_snapTarget == widget.currentIndex.toDouble()) {
+        return;
+      }
+      _animateTo(widget.currentIndex);
+    }
+  }
+
+  @override
+  void dispose() {
+    _removeSnapListener();
+    _expansionController.dispose();
+    _snapController.dispose();
+    _wobbleController.dispose();
+    _dragWobbleController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _dragPosition = widget.currentIndex.toDouble();
+
+    _expansionController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
+    _snapController =
+        AnimationController(vsync: this, duration: widget.animationDuration);
+    _wobbleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _dragWobbleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+  }
+
+  void _animateTo(int index) {
+    final clampedIndex = index.clamp(0, widget.items.length - 1);
+    final target = clampedIndex.toDouble();
+    _removeSnapListener();
+
+    if (_dragPosition == target) {
+      _wobbleController.forward(from: 0);
+      return;
+    }
+
+    _snapController.stop();
+    _wobbleController.stop();
+    _snapTarget = target;
+
+    final animation = Tween<double>(begin: _dragPosition, end: target).animate(
+      CurvedAnimation(parent: _snapController, curve: widget.curve),
+    );
+
+    _currentAnimation = animation;
+
+    void listener() {
+      if (_currentAnimation == animation && mounted) {
+        setState(() {
+          _dragPosition = animation.value;
+        });
+      }
+    }
+
+    _snapListener = listener;
+    animation.addListener(listener);
+    _snapController.addStatusListener(_snapStatusListener);
+    _snapController.forward(from: 0);
   }
 
   double _horizontalPadding(EdgeInsetsGeometry geometry) {
     final resolved = geometry.resolve(Directionality.of(context));
     return resolved.left + resolved.right;
   }
-}
 
-class _IOSLiquidPainter extends CustomPainter {
-  _IOSLiquidPainter({
-    required this.position,
-    required this.itemWidth,
-    required this.velocity,
-    required this.expansion,
-    required this.wobble,
-    required this.dragWobble,
-    required this.horizontalInset,
-    required this.primaryColor,
-    required this.surfaceColor,
-    required this.blobBaseWidthFactor,
-    required this.blobExpandedWidthFactor,
-    required this.blobBaseHeight,
-    required this.blobExpandedHeight,
-    required this.blobStretchMultiplier,
-    required this.blobMaxStretch,
-    required this.blobWobbleInfluenceOnWidth,
-    required this.blobWobbleInfluenceOnHeight,
-  });
-
-  final double position;
-  final double itemWidth;
-  final double velocity;
-  final double expansion;
-  final double wobble;
-  final double dragWobble;
-  final double horizontalInset;
-  final Color primaryColor;
-  final Color surfaceColor;
-  final double blobBaseWidthFactor;
-  final double blobExpandedWidthFactor;
-  final double blobBaseHeight;
-  final double blobExpandedHeight;
-  final double blobStretchMultiplier;
-  final double blobMaxStretch;
-  final double blobWobbleInfluenceOnWidth;
-  final double blobWobbleInfluenceOnHeight;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final centerX =
-        horizontalInset + (position * itemWidth) + (itemWidth / 2);
-
-    final baseWidth = itemWidth * blobBaseWidthFactor;
-    final expandedWidth = itemWidth * blobExpandedWidthFactor;
-    var currentWidth =
-        lerpDouble(baseWidth, expandedWidth, expansion) ?? baseWidth;
-
-    final stretch =
-        (velocity.abs() * blobStretchMultiplier).clamp(0.0, blobMaxStretch);
-    currentWidth += stretch + (wobble * blobWobbleInfluenceOnWidth);
-
-    final baseHeight = blobBaseHeight;
-    final expandedHeight = blobExpandedHeight;
-    var currentHeight =
-        lerpDouble(baseHeight, expandedHeight, expansion) ?? baseHeight;
-
-    currentHeight -= wobble * blobWobbleInfluenceOnHeight;
-    final dragWave =
-        math.sin(dragWobble * math.pi * 2) * velocity.abs().clamp(0.0, 1.0);
-    currentHeight += dragWave * 3.5;
-
-    final rect = Rect.fromCenter(
-      center: Offset(centerX, (size.height / 2) + (dragWave * 1.4)),
-      width: currentWidth,
-      height: currentHeight,
-    );
-
-    final rrect =
-        RRect.fromRectAndRadius(rect, Radius.circular(currentHeight / 2));
-
-    final liquidPaint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          surfaceColor.withValues(alpha: 0.95),
-          primaryColor.withValues(alpha: 0.18),
-          primaryColor.withValues(alpha: 0.45),
-        ],
-      ).createShader(rect);
-
-    canvas.drawRRect(
-      rrect.shift(const Offset(0, 3)),
-      Paint()
-        ..color = primaryColor.withValues(alpha: 0.15)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
-    );
-
-    canvas.drawRRect(rrect, liquidPaint);
-
-    canvas.drawRRect(
-      rrect,
-      Paint()
-        ..color = surfaceColor.withValues(alpha: 0.8)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.2,
-    );
+  void _removeSnapListener() {
+    final listener = _snapListener;
+    final animation = _currentAnimation;
+    if (listener != null && animation != null) {
+      animation.removeListener(listener);
+    }
+    _snapListener = null;
+    _snapController.removeStatusListener(_snapStatusListener);
   }
 
-  @override
-  bool shouldRepaint(covariant _IOSLiquidPainter oldDelegate) {
-    return oldDelegate.position != position ||
-        oldDelegate.itemWidth != itemWidth ||
-        oldDelegate.velocity != velocity ||
-        oldDelegate.expansion != expansion ||
-        oldDelegate.wobble != wobble ||
-        oldDelegate.dragWobble != dragWobble ||
-        oldDelegate.horizontalInset != horizontalInset ||
-        oldDelegate.primaryColor != primaryColor ||
-        oldDelegate.surfaceColor != surfaceColor ||
-        oldDelegate.blobBaseWidthFactor != blobBaseWidthFactor ||
-        oldDelegate.blobExpandedWidthFactor != blobExpandedWidthFactor ||
-        oldDelegate.blobBaseHeight != blobBaseHeight ||
-        oldDelegate.blobExpandedHeight != blobExpandedHeight ||
-        oldDelegate.blobStretchMultiplier != blobStretchMultiplier ||
-        oldDelegate.blobMaxStretch != blobMaxStretch ||
-        oldDelegate.blobWobbleInfluenceOnWidth !=
-            blobWobbleInfluenceOnWidth ||
-        oldDelegate.blobWobbleInfluenceOnHeight !=
-            blobWobbleInfluenceOnHeight;
+  void _selectIndex(int index) {
+    widget.onTap?.call(index);
+    widget.onChanged?.call(index);
+  }
+
+  bool _showBadge(int index) {
+    final badges = widget.badges;
+    if (badges == null || !badges.containsKey(index)) return false;
+    return (badges[index] ?? 0) > 0;
+  }
+
+  void _snapStatusListener(AnimationStatus status) {
+    if (status != AnimationStatus.completed) return;
+    _removeSnapListener();
+    _snapTarget = null;
+    if (mounted) {
+      _wobbleController.forward(from: 0);
+    }
   }
 }
