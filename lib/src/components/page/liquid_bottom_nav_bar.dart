@@ -699,13 +699,14 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                                       fontSize: 9,
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      color: style.liquidColor,
+                                                      color: style
+                                                          .activeLabelColor,
                                                     ))
                                                 : (style.labelStyle ??
                                                     TextStyle(
                                                       fontSize: 9,
                                                       color: style
-                                                          .inactiveIconColor,
+                                                          .inactiveLabelColor,
                                                     )),
                                           ),
                                         ),

@@ -10,6 +10,8 @@ class LiquidNavStyle {
     this.liquidColor,
     this.activeIconColor,
     this.inactiveIconColor,
+    this.activeLabelColor,
+    this.inactiveLabelColor,
     this.border,
     this.borderSide,
     this.borderRadius,
@@ -25,6 +27,8 @@ class LiquidNavStyle {
   final Color? liquidColor;
   final Color? activeIconColor;
   final Color? inactiveIconColor;
+  final Color? activeLabelColor;
+  final Color? inactiveLabelColor;
   final Border? border;
   final BorderSide? borderSide;
   final BorderRadiusGeometry? borderRadius;
@@ -48,6 +52,8 @@ class LiquidNavStyle {
       liquidColor: other.liquidColor,
       activeIconColor: other.activeIconColor,
       inactiveIconColor: other.inactiveIconColor,
+      activeLabelColor: other.activeLabelColor,
+      inactiveLabelColor: other.inactiveLabelColor,
       border: other.border,
       borderSide: other.borderSide,
       borderRadius: other.borderRadius,
@@ -70,6 +76,8 @@ class LiquidNavStyle {
       activeIconColor: activeIconColor ?? Colors.white,
       inactiveIconColor:
           inactiveIconColor ?? (isLight ? const Color(0xFF6B7280) : const Color(0xFF9CA3AF)),
+      activeLabelColor: activeLabelColor ?? colors.textPrimary,
+      inactiveLabelColor: inactiveLabelColor ?? (isLight ? const Color(0xFF6B7280) : const Color(0xFF9CA3AF)),
       borderSide:
           borderSide ?? BorderSide(color: (isLight ? Colors.black : Colors.white).withValues(alpha: 0.07), width: 0.8),
       borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(28)),
@@ -93,6 +101,8 @@ class LiquidNavStyle {
     Color? liquidColor,
     Color? activeIconColor,
     Color? inactiveIconColor,
+    Color? activeLabelColor,
+    Color? inactiveLabelColor,
     Border? border,
     BorderSide? borderSide,
     BorderRadiusGeometry? borderRadius,
@@ -108,6 +118,8 @@ class LiquidNavStyle {
       liquidColor: liquidColor ?? this.liquidColor,
       activeIconColor: activeIconColor ?? this.activeIconColor,
       inactiveIconColor: inactiveIconColor ?? this.inactiveIconColor,
+      activeLabelColor: activeLabelColor ?? this.activeLabelColor,
+      inactiveLabelColor: inactiveLabelColor ?? this.inactiveLabelColor,
       border: border ?? this.border,
       borderSide: borderSide ?? this.borderSide,
       borderRadius: borderRadius ?? this.borderRadius,
