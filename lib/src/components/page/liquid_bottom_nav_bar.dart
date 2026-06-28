@@ -7,6 +7,8 @@ import '../../theme/theme_extensions.dart';
 import 'liquid_nav_item.dart';
 import 'liquid_nav_style.dart';
 
+enum LiquidColorMode { single, gradient }
+
 typedef LiquidNavItemIconBuilder = IconData Function(LiquidNavItem item);
 
 /// A liquid-like bottom navigation bar with physics-based blob animation,
@@ -90,6 +92,10 @@ class LiquidBottomNavBar extends StatefulWidget {
   final double dragWaveHeightMultiplier;
   final double dragWavePositionMultiplier;
   final bool showBorder;
+  final LiquidColorMode colorMode;
+  final List<Color>? customGradientColors;
+  final Color? borderColor;
+  final List<Color>? borderGradientColors;
   const LiquidBottomNavBar({
     super.key,
     required this.currentIndex,
@@ -144,6 +150,10 @@ class LiquidBottomNavBar extends StatefulWidget {
     this.dragWaveHeightMultiplier = 3.5,
     this.dragWavePositionMultiplier = 1.4,
     this.showBorder = true,
+    this.colorMode = LiquidColorMode.gradient,
+    this.customGradientColors,
+    this.borderColor,
+    this.borderGradientColors,
   })  : assert(items.length >= 2, 'items must contain at least 2 entries'),
         assert(onTap != null || onChanged != null,
             'Provide onTap or onChanged callback');
@@ -182,6 +192,10 @@ class _IOSLiquidPainter extends CustomPainter {
   final double dragWaveHeightMultiplier;
   final double dragWavePositionMultiplier;
   final bool showBorder;
+  final LiquidColorMode colorMode;
+  final List<Color>? customGradientColors;
+  final Color? borderColor;
+  final List<Color>? borderGradientColors;
   _IOSLiquidPainter({
     required this.position,
     required this.itemWidth,
@@ -211,6 +225,10 @@ class _IOSLiquidPainter extends CustomPainter {
     required this.dragWaveHeightMultiplier,
     required this.dragWavePositionMultiplier,
     required this.showBorder,
+    required this.colorMode,
+    this.customGradientColors,
+    this.borderColor,
+    this.borderGradientColors,
   });
 
   @override
@@ -246,16 +264,24 @@ class _IOSLiquidPainter extends CustomPainter {
     final rrect =
         RRect.fromRectAndRadius(rect, Radius.circular(currentHeight / 2));
 
-    final liquidPaint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          surfaceColor.withValues(alpha: gradientSurfaceAlpha),
-          primaryColor.withValues(alpha: gradientPrimaryAlpha1),
-          primaryColor.withValues(alpha: gradientPrimaryAlpha2),
-        ],
-      ).createShader(rect);
+    Paint liquidPaint;
+    if (colorMode == LiquidColorMode.single) {
+      liquidPaint = Paint()
+        ..color = primaryColor.withValues(alpha: gradientPrimaryAlpha1);
+    } else {
+      final gradientColors = customGradientColors ??
+          [
+            surfaceColor.withValues(alpha: gradientSurfaceAlpha),
+            primaryColor.withValues(alpha: gradientPrimaryAlpha1),
+            primaryColor.withValues(alpha: gradientPrimaryAlpha2),
+          ];
+      liquidPaint = Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradientColors,
+        ).createShader(rect);
+    }
 
     canvas.drawRRect(
       rrect.shift(Offset(0, shadowOffset)),
@@ -267,13 +293,24 @@ class _IOSLiquidPainter extends CustomPainter {
     canvas.drawRRect(rrect, liquidPaint);
 
     if (showBorder) {
-      canvas.drawRRect(
-        rrect,
-        Paint()
-          ..color = surfaceColor.withValues(alpha: borderAlpha)
+      Paint borderPaint;
+      if (borderGradientColors != null && borderGradientColors!.length > 1) {
+        borderPaint = Paint()
+          ..shader = LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: borderGradientColors!,
+          ).createShader(rect)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = borderWidth,
-      );
+          ..strokeWidth = borderWidth;
+      } else {
+        final finalBorderColor = borderColor ?? surfaceColor;
+        borderPaint = Paint()
+          ..color = finalBorderColor.withValues(alpha: borderAlpha)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = borderWidth;
+      }
+      canvas.drawRRect(rrect, borderPaint);
     }
   }
 
@@ -307,7 +344,11 @@ class _IOSLiquidPainter extends CustomPainter {
         oldDelegate.gradientPrimaryAlpha2 != gradientPrimaryAlpha2 ||
         oldDelegate.dragWaveHeightMultiplier != dragWaveHeightMultiplier ||
         oldDelegate.dragWavePositionMultiplier != dragWavePositionMultiplier ||
-        oldDelegate.showBorder != showBorder;
+        oldDelegate.showBorder != showBorder ||
+        oldDelegate.colorMode != colorMode ||
+        oldDelegate.customGradientColors != customGradientColors ||
+        oldDelegate.borderColor != borderColor ||
+        oldDelegate.borderGradientColors != borderGradientColors;
   }
 }
 
@@ -550,6 +591,12 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                   dragWavePositionMultiplier:
                                       _animatedDragWavePositionMultiplier,
                                   showBorder: widget.showBorder,
+                                  colorMode: widget.colorMode,
+                                  customGradientColors:
+                                      widget.customGradientColors,
+                                  borderColor: widget.borderColor,
+                                  borderGradientColors:
+                                      widget.borderGradientColors,
                                 ),
                               );
                             },
