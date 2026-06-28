@@ -331,7 +331,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                     height: innerHeight,
                     decoration: BoxDecoration(
                       borderRadius: style.borderRadius,
-                      border: style.resolveBorder(),
+                      //border: style.resolveBorder(),
                     ),
                     child: Stack(
                       clipBehavior: Clip.none,
@@ -443,12 +443,12 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                                 decoration: BoxDecoration(
                                                   color: widget.badgeColor,
                                                   shape: BoxShape.circle,
-                                                  border: Border.all(
-                                                    color: widget
-                                                            .badgeBorderColor ??
-                                                        style.containerColor!,
-                                                    width: 1.5,
-                                                  ),
+                                                  // border: Border.all(
+                                                  //   color: widget
+                                                  //           .badgeBorderColor ??
+                                                  //       style.containerColor!,
+                                                  //   width: 1.5,
+                                                  // ),
                                                 ),
                                                 constraints:
                                                     const BoxConstraints(
