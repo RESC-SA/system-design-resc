@@ -692,22 +692,12 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                               const EdgeInsets.only(top: 2),
                                           child: Text(
                                             item.label!,
-                                            style: isSelected
-                                                ? (item.labelStyle ??
-                                                    style.activeLabelStyle ??
-                                                    TextStyle(
-                                                      fontSize: 9,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: style
-                                                          .activeLabelColor,
-                                                    ))
-                                                : (item.labelStyle ??
-                                                    TextStyle(
-                                                      fontSize: 9,
-                                                      color: style
-                                                          .inactiveLabelColor,
-                                                    )),
+                                            style: TextStyle(
+                                              fontSize: 9,
+                                              color: isSelected
+                                                  ? item.colorSelected ?? colors.primary
+                                                  : item.colorUnselected ?? colors.textPrimary,
+                                            ),
                                           ),
                                         ),
                                     ],

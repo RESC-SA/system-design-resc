@@ -10,6 +10,8 @@ class LiquidNavItem {
     this.label,
     this.semanticLabel,
     this.colorIconNavBar,
+    this.colorSelected,
+    this.colorUnselected,
     this.labelStyle,
   });
 
@@ -19,5 +21,7 @@ class LiquidNavItem {
   final String? label;
   final String? semanticLabel;
   final Color? colorIconNavBar;
+  final Color? colorSelected;
+  final Color? colorUnselected;
   final TextStyle? labelStyle;
 }
