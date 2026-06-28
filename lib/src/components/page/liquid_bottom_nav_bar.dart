@@ -7,8 +7,6 @@ import '../../theme/theme_extensions.dart';
 import 'liquid_nav_item.dart';
 import 'liquid_nav_style.dart';
 
-enum LiquidColorMode { single, gradient }
-
 typedef LiquidNavItemIconBuilder = IconData Function(LiquidNavItem item);
 
 /// A liquid-like bottom navigation bar with physics-based blob animation,
@@ -161,6 +159,8 @@ class LiquidBottomNavBar extends StatefulWidget {
   @override
   State<LiquidBottomNavBar> createState() => _LiquidBottomNavBarState();
 }
+
+enum LiquidColorMode { single, gradient }
 
 class _IOSLiquidPainter extends CustomPainter {
   final double position;
@@ -702,7 +702,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                                       color: style
                                                           .activeLabelColor,
                                                     ))
-                                                : (style.labelStyle ??
+                                                : (item.labelStyle ??
                                                     TextStyle(
                                                       fontSize: 9,
                                                       color: style
