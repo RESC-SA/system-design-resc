@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../../pkg-icons/widgets/svg_icon.dart';
 import '../../theme/theme_extensions.dart';
 import 'liquid_nav_item.dart';
 import 'liquid_nav_style.dart';
@@ -611,13 +612,56 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                               final distance = (index - _dragPosition).abs();
                               final isSelected = index == safeIndex;
 
-                              final iconData = isSelected
-                                  ? (widget.activeIcon?.call(item) ??
-                                      item.activeIcon ??
-                                      item.icon)
-                                  : (widget.inactiveIcon?.call(item) ??
-                                      item.inactiveIcon ??
-                                      item.icon);
+                              final iconColor =
+                                  widget.items[index].colorIconNavBar ??
+                                      Color.lerp(
+                                        style.inactiveIconColor,
+                                        style.activeIconColor,
+                                        (1.0 - distance).clamp(0.0, 1.0),
+                                      );
+
+                              Widget iconWidget;
+                              switch (item.iconType) {
+                                case LiquidIconType.image:
+                                  final imagePath = isSelected
+                                      ? (item.activeImagePath ?? item.imagePath)
+                                      : (item.inactiveImagePath ??
+                                          item.imagePath);
+                                  iconWidget = imagePath != null
+                                      ? Image.asset(
+                                          imagePath,
+                                          width: widget.iconSize,
+                                          height: widget.iconSize,
+                                          color: iconColor,
+                                        )
+                                      : const SizedBox.shrink();
+                                  break;
+                                case LiquidIconType.svg:
+                                  final svgPath = isSelected
+                                      ? (item.activeSvgPath ?? item.svgPath)
+                                      : (item.inactiveSvgPath ?? item.svgPath);
+                                  iconWidget = svgPath != null
+                                      ? SvgIcon(
+                                          assetName: svgPath,
+                                          size: widget.iconSize,
+                                          color: iconColor,
+                                        )
+                                      : const SizedBox.shrink();
+                                  break;
+                                case LiquidIconType.iconData:
+                                  final iconData = isSelected
+                                      ? (widget.activeIcon?.call(item) ??
+                                          item.activeIcon ??
+                                          item.icon)
+                                      : (widget.inactiveIcon?.call(item) ??
+                                          item.inactiveIcon ??
+                                          item.icon);
+                                  iconWidget = Icon(
+                                    iconData,
+                                    size: widget.iconSize,
+                                    color: iconColor,
+                                  );
+                              }
 
                               return Expanded(
                                 child: GestureDetector(
@@ -632,18 +676,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                       Stack(
                                         clipBehavior: Clip.none,
                                         children: [
-                                          Icon(
-                                            iconData,
-                                            size: widget.iconSize,
-                                            color: widget.items[index]
-                                                    .colorIconNavBar ??
-                                                Color.lerp(
-                                                  style.inactiveIconColor,
-                                                  style.activeIconColor,
-                                                  (1.0 - distance)
-                                                      .clamp(0.0, 1.0),
-                                                ),
-                                          ),
+                                          iconWidget,
                                           if (_showBadge(index))
                                             Positioned(
                                               right: -6,
@@ -695,8 +728,10 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                             style: TextStyle(
                                               fontSize: 9,
                                               color: isSelected
-                                                  ? item.colorSelected ?? colors.primary
-                                                  : item.colorUnselected ?? colors.textPrimary,
+                                                  ? item.colorSelected ??
+                                                      colors.primary
+                                                  : item.colorUnselected ??
+                                                      colors.textPrimary,
                                             ),
                                           ),
                                         ),
