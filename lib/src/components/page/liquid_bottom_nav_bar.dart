@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:full_svg_flutter/flutter_svg.dart';
 
 import '../../pkg-icons/widgets/svg_icon.dart';
 import '../../theme/theme_extensions.dart';
@@ -662,6 +663,20 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                   break;
                                 case LiquidIconType.widget:
                                   iconWidget = item.customWidget ?? const SizedBox.shrink();
+                                  break;
+                                case LiquidIconType.svgx:
+                                  final svgxPath = item.svgxPath;
+                                  iconWidget = svgxPath != null
+                                      ? SvgPicture.asset(
+                                          svgxPath,
+                                          width: widget.iconSize,
+                                          height: widget.iconSize,
+                                          colorFilter: ColorFilter.mode(
+                                            iconColor ?? Colors.black,
+                                            BlendMode.srcIn,
+                                          ),
+                                        )
+                                      : const SizedBox.shrink();
                                   break;
                               }
 

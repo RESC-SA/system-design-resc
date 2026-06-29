@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-enum LiquidIconType { iconData, image, svg, widget }
+enum LiquidIconType { iconData, image, svg, widget, svgx }
 
 /// Model for a single navigation item.
 @immutable
@@ -21,6 +21,7 @@ class LiquidNavItem {
   final String? activeImagePath;
   final String? inactiveImagePath;
   final Widget? customWidget;
+  final String? svgxPath;
   const LiquidNavItem({
     this.icon,
     this.activeIcon,
@@ -37,5 +38,6 @@ class LiquidNavItem {
     this.activeImagePath,
     this.inactiveImagePath,
     this.customWidget,
+    this.svgxPath,
   });
 }
