@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" width="20" height="20"><g transform="translate(0, 0)">
+<mask id="mask0_3_3" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="20" height="20">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M0 0H19.9999V20H0V0Z" fill="white"/>
+</mask>
+<g mask="url(#mask0_3_3)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M5.664 1.5C3.135 1.5 1.5 3.233 1.5 5.916V14.084C1.5 16.767 3.135 18.5 5.664 18.5H14.332C16.864 18.5 18.5 16.767 18.5 14.084V5.916C18.5 3.233 16.864 1.5 14.334 1.5H5.664ZM14.332 20H5.664C2.276 20 0 17.622 0 14.084V5.916C0 2.378 2.276 0 5.664 0H14.334C17.723 0 20 2.378 20 5.916V14.084C20 17.622 17.723 20 14.332 20V20Z" fill="black"/>
+</g>
+</g><g transform="translate(8, 5)">
+<g>
+<animateTransform attributeName="transform" type="translate" values="0 0; -0.6 -2; 0 0" dur="2s" repeatCount="1" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.25 0.1 0.25 1;0.25 0.1 0.25 1" additive="sum"/>
+<animateTransform attributeName="transform" type="scale" values="1; 1.4; 1" dur="2s" repeatCount="1" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.25 0.1 0.25 1;0.25 0.1 0.25 1" additive="sum"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M1.0001 9.5459C0.586099 9.5459 0.250099 9.2099 0.250099 8.7959V4.7959C0.250099 4.3819 0.586099 4.0459 1.0001 4.0459C1.4141 4.0459 1.7501 4.3819 1.7501 4.7959V8.7959C1.7501 9.2099 1.4141 9.5459 1.0001 9.5459" fill="black"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M1.005 2C0.452 2 0 1.553 0 1C0 0.447 0.443 0 0.995 0H1.005C1.558 0 2.005 0.447 2.005 1C2.005 1.553 1.558 2 1.005 2" fill="black"/>
+</g>
+</g></svg>
