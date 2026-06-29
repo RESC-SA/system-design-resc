@@ -637,9 +637,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                       : const SizedBox.shrink();
                                   break;
                                 case LiquidIconType.svg:
-                                  final svgPath = isSelected
-                                      ? (item.activeSvgPath ?? item.svgPath)
-                                      : (item.inactiveSvgPath ?? item.svgPath);
+                                  final svgPath = item.svgPath;
                                   iconWidget = svgPath != null
                                       ? SvgIcon(
                                           assetName: svgPath,

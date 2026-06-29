@@ -6,6 +6,11 @@ class SvgIcon extends StatelessWidget {
   final double size;
   final Color? color;
   final String? semanticLabel;
+  final BoxFit fit;
+  final ColorFilter? colorFilter;
+  final Color? backgroundColor;
+  final bool? autoPlay;
+  final double? playbackRate;
 
   const SvgIcon({
     super.key,
@@ -13,6 +18,11 @@ class SvgIcon extends StatelessWidget {
     this.size = 24,
     this.color,
     this.semanticLabel,
+    this.autoPlay,
+    this.playbackRate,
+    this.backgroundColor,
+    this.colorFilter,
+    this.fit = BoxFit.contain,
   });
 
   @override
@@ -26,10 +36,13 @@ class SvgIcon extends StatelessWidget {
         assetName,
         width: size,
         height: size,
-        fit: BoxFit.contain,
-        colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+        fit: fit,
+        colorFilter: colorFilter ?? ColorFilter.mode(iconColor, BlendMode.srcIn),
         semanticsLabel: semanticLabel,
         excludeFromSemantics: semanticLabel == null,
+        backgroundColor: backgroundColor,
+        autoPlay: autoPlay ?? false,
+        playbackRate: playbackRate ?? 1.0,
       ),
     );
   }

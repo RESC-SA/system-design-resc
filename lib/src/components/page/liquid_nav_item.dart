@@ -20,8 +20,6 @@ class LiquidNavItem {
   final String? svgPath;
   final String? activeImagePath;
   final String? inactiveImagePath;
-  final String? activeSvgPath;
-  final String? inactiveSvgPath;
   const LiquidNavItem({
     this.icon,
     this.activeIcon,
@@ -37,7 +35,6 @@ class LiquidNavItem {
     this.svgPath,
     this.activeImagePath,
     this.inactiveImagePath,
-    this.activeSvgPath,
-    this.inactiveSvgPath,
+    
   });
 }
