@@ -659,6 +659,10 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                     size: widget.iconSize,
                                     color: iconColor,
                                   );
+                                  break;
+                                case LiquidIconType.widget:
+                                  iconWidget = item.customWidget ?? const SizedBox.shrink();
+                                  break;
                               }
 
                               return Expanded(
