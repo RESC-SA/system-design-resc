@@ -54,5 +54,12 @@ export 'src/components/page/liquid_bottom_nav_bar.dart';
 export 'src/utils/extensions.dart';
 export 'src/utils/text_field_extensions.dart';
 
+// Pkg Icons
+export 'src/pkg-icons/widgets/widgets.dart';
+
 // Routing
 export 'src/routing/app_router.dart';
+
+// Assets
+export 'generated/assets.dart';
+
