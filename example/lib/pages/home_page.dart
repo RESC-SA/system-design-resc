@@ -1,21 +1,81 @@
+import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_design_system/flutter_design_system.dart' as ds;
-import 'package:amicons/amicons.dart';
-import 'containers_page.dart';
+
 import 'buttons_page.dart';
+import 'cards_page.dart';
+import 'containers_page.dart';
+import 'feedback_page.dart';
 import 'fields_page.dart';
 import 'indicators_page.dart';
 import 'lists_page.dart';
-import 'scaffolds_page.dart';
-import 'feedback_page.dart';
-import 'cards_page.dart';
 import 'navigation_page.dart';
+import 'scaffolds_page.dart';
+
+class AppHeader extends StatelessWidget {
+  final BuildContext context;
+  const AppHeader({super.key, required this.context});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ds.AppContainer(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: context.colors.primary.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Icon(Amicons.lucide_blocks,
+                        color: context.colors.primary, size: 28),
+                  ),
+                  ds.AppSpacer.md(horizontal: true),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Design System',
+                            style: theme.textTheme.headlineLarge),
+                        Text('Widget Showcase',
+                            style: TextStyle(
+                              color: context.colors.textSecondary,
+                              fontSize: 14,
+                            )),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              ds.AppSpacer.md(),
+              Text(
+                'Complete demonstration of all components from the Flutter Design System package.',
+                style: TextStyle(
+                    color: context.colors.textSecondary, fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 class HomePage extends StatelessWidget {
   final VoidCallback onToggleTheme;
   final bool isDark;
 
-  const HomePage({super.key, required this.onToggleTheme, required this.isDark});
+  const HomePage(
+      {super.key, required this.onToggleTheme, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +98,8 @@ class HomePage extends StatelessWidget {
       _Section(
         icon: Amicons.lucide_text_cursor_input,
         label: 'Form Fields',
-        desc: 'TextField, Search, Dropdown, Switch, Slider, Checkbox, Segmented',
+        desc:
+            'TextField, Search, Dropdown, Switch, Slider, Checkbox, Segmented',
         color: context.colors.neonBlue,
         page: const FieldsPage(),
       ),
@@ -52,7 +113,8 @@ class HomePage extends StatelessWidget {
       _Section(
         icon: Amicons.lucide_menu,
         label: 'Lists',
-        desc: 'AppListView, AppListItem, SectionHeader, EmptyState, Dismissible',
+        desc:
+            'AppListView, AppListItem, SectionHeader, EmptyState, Dismissible',
         color: context.colors.neonPurple,
         page: const ListsPage(),
       ),
@@ -88,7 +150,7 @@ class HomePage extends StatelessWidget {
 
     return ds.AppScaffold(
       title: 'Design System',
-      backgroundColor: context.scaffoldBg,
+      backgroundColor: context.AppscaffoldBg,
       showBackButton: false,
       actions: [
         IconButton(
@@ -103,9 +165,9 @@ class HomePage extends StatelessWidget {
           AppHeader(context: context),
           ds.AppSpacer.lg(),
           ...sections.map((s) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: _SectionCard(section: s),
-          )),
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _SectionCard(section: s),
+              )),
         ],
       ),
     );
@@ -135,7 +197,8 @@ class _SectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return ds.AppCard(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => section.page)),
+      onTap: () => Navigator.push(
+          context, MaterialPageRoute(builder: (_) => section.page)),
       elevation: 0,
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -156,69 +219,17 @@ class _SectionCard extends StatelessWidget {
               children: [
                 Text(section.label, style: theme.textTheme.titleLarge),
                 ds.AppSpacer.xxl(),
-                Text(section.desc, style: theme.textTheme.bodyMedium?.copyWith(
-                  color: context.colors.textSecondary,
-                )),
+                Text(section.desc,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: context.colors.textSecondary,
+                    )),
               ],
             ),
           ),
-          Icon(Amicons.lucide_chevron_right, color: context.colors.textDim, size: 20),
+          Icon(Amicons.lucide_chevron_right,
+              color: context.colors.textDim, size: 20),
         ],
       ),
-    );
-  }
-}
-
-class AppHeader extends StatelessWidget {
-  final BuildContext context;
-  const AppHeader({super.key, required this.context});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ds.AppContainer(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: context.colors.primary.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(Amicons.lucide_blocks, color: context.colors.primary, size: 28),
-                  ),
-                  ds.AppSpacer.md(horizontal: true),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Design System', style: theme.textTheme.headlineLarge),
-                        Text('Widget Showcase', style: TextStyle(
-                          color: context.colors.textSecondary,
-                          fontSize: 14,
-                        )),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              ds.AppSpacer.md(),
-              Text(
-                'Complete demonstration of all components from the Flutter Design System package.',
-                style: TextStyle(color: context.colors.textSecondary, fontSize: 13),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

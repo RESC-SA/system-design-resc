@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import '../../theme/theme_extensions.dart';
+
 import 'liquid_nav_item.dart';
 import 'liquid_nav_style.dart';
 
@@ -435,7 +435,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
   @override
   Widget build(BuildContext context) {
     final int safeIndex = widget.currentIndex.clamp(0, widget.items.length - 1);
-    final colors = context.colors;
+    // final colors = context.colors;
 
     final style = widget.style
         .copyWith(
@@ -637,7 +637,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                 // case LiquidIconType.svg:
                                 //   final svgPath = item.svgPath;
                                 //   iconWidget = svgPath != null
-                                //       ? SvgIcon( 
+                                //       ? SvgIcon(
                                 //           assetName: svgPath,
                                 //           size: widget.iconSize,
                                 //           color: iconColor,
@@ -659,7 +659,8 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                   );
                                   break;
                                 case LiquidIconType.widget:
-                                  iconWidget = item.customWidget ?? const SizedBox.shrink();
+                                  iconWidget = item.customWidget ??
+                                      const SizedBox.shrink();
                                   break;
                                 // case LiquidIconType.svgx:
                                 //   final svgxPath = item.svgxPath;
@@ -740,13 +741,10 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                           child: Text(
                                             item.label!,
                                             style: TextStyle(
-                                              fontSize: 9,
-                                              color: isSelected
-                                                  ? item.colorSelected ??
-                                                      colors.primary
-                                                  : item.colorUnselected ??
-                                                      colors.textPrimary,
-                                            ),
+                                                fontSize: 9,
+                                                color: isSelected
+                                                    ? item.colorSelected
+                                                    : item.colorUnselected),
                                           ),
                                         ),
                                     ],
