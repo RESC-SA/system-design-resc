@@ -89,6 +89,7 @@ class LiquidBottomNavBar extends StatefulWidget {
   final double dragWaveHeightMultiplier;
   final double dragWavePositionMultiplier;
   final bool showBorder;
+  final bool canScroll;
   final LiquidColorMode colorMode;
   final List<Color>? customGradientColors;
   final Color? borderColor;
@@ -147,6 +148,7 @@ class LiquidBottomNavBar extends StatefulWidget {
     this.dragWaveHeightMultiplier = 3.5,
     this.dragWavePositionMultiplier = 1.4,
     this.showBorder = true,
+    this.canScroll = true,
     this.colorMode = LiquidColorMode.gradient,
     this.customGradientColors,
     this.borderColor,
@@ -478,35 +480,42 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
             child: Container(
               alignment: Alignment.center,
               child: GestureDetector(
-                onPanStart: (_) {
-                  setState(() => _isDragging = true);
-                  _expansionController.forward();
-                  _wobbleController.stop();
-                  _snapController.stop();
-                  _dragWobbleController.repeat();
-                },
-                onPanUpdate: (details) {
-                  setState(() {
-                    _velocity = details.delta.dx / itemWidth;
-                    _dragPosition = (_dragPosition + _velocity).clamp(
-                      0.0,
-                      (widget.items.length - 1).toDouble(),
-                    );
-                  });
-                },
-                onPanEnd: (_) {
-                  setState(() {
-                    _isDragging = false;
-                    _velocity = 0;
-                  });
-                  _dragWobbleController.stop();
-                  _expansionController.reverse();
-                  final nearestTab =
-                      _dragPosition.round().clamp(0, widget.items.length - 1);
-                  _animateTo(nearestTab);
-                  widget.onDrag?.call(nearestTab);
-                  _selectIndex(nearestTab);
-                },
+                onPanStart: widget.canScroll
+                    ? (_) {
+                        setState(() => _isDragging = true);
+                        _expansionController.forward();
+                        _wobbleController.stop();
+                        _snapController.stop();
+                        _dragWobbleController.repeat();
+                      }
+                    : null,
+                onPanUpdate: widget.canScroll
+                    ? (details) {
+                        setState(() {
+                          _velocity = details.delta.dx / itemWidth;
+                          _dragPosition = (_dragPosition + _velocity).clamp(
+                            0.0,
+                            (widget.items.length - 1).toDouble(),
+                          );
+                        });
+                      }
+                    : null,
+                onPanEnd: widget.canScroll
+                    ? (_) {
+                        setState(() {
+                          _isDragging = false;
+                          _velocity = 0;
+                        });
+                        _dragWobbleController.stop();
+                        _expansionController.reverse();
+                        final nearestTab = _dragPosition
+                            .round()
+                            .clamp(0, widget.items.length - 1);
+                        _animateTo(nearestTab);
+                        widget.onDrag?.call(nearestTab);
+                        _selectIndex(nearestTab);
+                      }
+                    : null,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     borderRadius: style.borderRadius,
