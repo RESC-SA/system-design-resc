@@ -49,12 +49,12 @@ class AppScaffold extends StatelessWidget {
     final canPop = Navigator.of(context).canPop();
 
     return Scaffold(
-      backgroundColor: backgroundColor ?? context.scaffoldBg,
+      backgroundColor: backgroundColor ?? context.AppscaffoldBg,
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
       appBar: customAppBar ??
           (title != null
               ? AppBar(
-                  backgroundColor: context.scaffoldBg,
+                  backgroundColor: context.AppscaffoldBg,
                   surfaceTintColor: Colors.transparent,
                   scrolledUnderElevation: 0,
                   elevation: 0,

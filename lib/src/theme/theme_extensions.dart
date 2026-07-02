@@ -20,5 +20,5 @@ extension AppColorsX on BuildContext {
 }
 
 extension ScaffoldBgX on BuildContext {
-  Color get scaffoldBg => colors.scaffoldBg;
+  Color get AppscaffoldBg => colors.scaffoldBg;
 }
