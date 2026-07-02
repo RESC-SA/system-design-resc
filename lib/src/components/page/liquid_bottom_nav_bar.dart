@@ -90,6 +90,7 @@ class LiquidBottomNavBar extends StatefulWidget {
   final double dragWavePositionMultiplier;
   final bool showBorder;
   final bool canScroll;
+  final Axis scrollDirection;
   final LiquidColorMode colorMode;
   final List<Color>? customGradientColors;
   final Color? borderColor;
@@ -149,6 +150,7 @@ class LiquidBottomNavBar extends StatefulWidget {
     this.dragWavePositionMultiplier = 1.4,
     this.showBorder = true,
     this.canScroll = true,
+    this.scrollDirection = Axis.horizontal,
     this.colorMode = LiquidColorMode.gradient,
     this.customGradientColors,
     this.borderColor,
@@ -193,6 +195,7 @@ class _IOSLiquidPainter extends CustomPainter {
   final double dragWaveHeightMultiplier;
   final double dragWavePositionMultiplier;
   final bool showBorder;
+  final bool isVertical;
   final LiquidColorMode colorMode;
   final List<Color>? customGradientColors;
   final Color? borderColor;
@@ -226,6 +229,7 @@ class _IOSLiquidPainter extends CustomPainter {
     required this.dragWaveHeightMultiplier,
     required this.dragWavePositionMultiplier,
     required this.showBorder,
+    required this.isVertical,
     required this.colorMode,
     this.customGradientColors,
     this.borderColor,
@@ -234,7 +238,9 @@ class _IOSLiquidPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final centerX = horizontalInset + (position * itemWidth) + (itemWidth / 2);
+    final pos = horizontalInset + (position * itemWidth) + (itemWidth / 2);
+    final centerX = isVertical ? size.width / 2 : pos;
+    final centerY = isVertical ? pos : size.height / 2;
 
     final baseWidth = itemWidth * blobBaseWidthFactor;
     final expandedWidth = itemWidth * blobExpandedWidthFactor;
@@ -255,9 +261,15 @@ class _IOSLiquidPainter extends CustomPainter {
         math.sin(dragWobble * math.pi * 2) * velocity.abs().clamp(0.0, 1.0);
     currentHeight += dragWave * dragWaveHeightMultiplier;
 
+    final dx = isVertical
+        ? 0.0
+        : dragWave * dragWavePositionMultiplier;
+    final dy = isVertical
+        ? dragWave * dragWavePositionMultiplier
+        : 0.0;
+
     final rect = Rect.fromCenter(
-      center: Offset(
-          centerX, (size.height / 2) + (dragWave * dragWavePositionMultiplier)),
+      center: Offset(centerX + dx, centerY + dy),
       width: currentWidth,
       height: currentHeight,
     );
@@ -346,6 +358,7 @@ class _IOSLiquidPainter extends CustomPainter {
         oldDelegate.dragWaveHeightMultiplier != dragWaveHeightMultiplier ||
         oldDelegate.dragWavePositionMultiplier != dragWavePositionMultiplier ||
         oldDelegate.showBorder != showBorder ||
+        oldDelegate.isVertical != isVertical ||
         oldDelegate.colorMode != colorMode ||
         oldDelegate.customGradientColors != customGradientColors ||
         oldDelegate.borderColor != borderColor ||
@@ -462,308 +475,182 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
       margin: widget.margin,
       child: LayoutBuilder(
         builder: (context, constraints) {
+          final isVertical = widget.scrollDirection == Axis.vertical;
           final availableWidth = constraints.maxWidth.isFinite
               ? constraints.maxWidth
               : MediaQuery.sizeOf(context).width;
           final maxWidth = math.max(0.0, widget.width ?? availableWidth);
-          final totalWidth =
-              math.max(0.0, maxWidth - _horizontalPadding(widget.padding));
-          final itemWidth = totalWidth / widget.items.length;
           final resolvedPadding =
               widget.padding.resolve(Directionality.of(context));
           final innerHeight =
               math.max(48.0, widget.height - resolvedPadding.vertical);
 
-          Widget navBar = SizedBox(
-            width: maxWidth,
-            height: widget.height,
-            child: Container(
-              alignment: Alignment.center,
-              child: GestureDetector(
-                onPanStart: widget.canScroll
-                    ? (_) {
-                        setState(() => _isDragging = true);
-                        _expansionController.forward();
-                        _wobbleController.stop();
-                        _snapController.stop();
-                        _dragWobbleController.repeat();
-                      }
-                    : null,
-                onPanUpdate: widget.canScroll
-                    ? (details) {
-                        setState(() {
-                          _velocity = details.delta.dx / itemWidth;
-                          _dragPosition = (_dragPosition + _velocity).clamp(
-                            0.0,
-                            (widget.items.length - 1).toDouble(),
-                          );
-                        });
-                      }
-                    : null,
-                onPanEnd: widget.canScroll
-                    ? (_) {
-                        setState(() {
-                          _isDragging = false;
-                          _velocity = 0;
-                        });
-                        _dragWobbleController.stop();
-                        _expansionController.reverse();
-                        final nearestTab = _dragPosition
-                            .round()
-                            .clamp(0, widget.items.length - 1);
-                        _animateTo(nearestTab);
-                        widget.onDrag?.call(nearestTab);
-                        _selectIndex(nearestTab);
-                      }
-                    : null,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: style.borderRadius,
-                    boxShadow: style.boxShadow,
-                  ),
-                  child: Container(
-                    height: innerHeight,
+          final availableSpace = isVertical
+              ? math.max(1.0, innerHeight - resolvedPadding.vertical)
+              : math.max(0.0, maxWidth - _horizontalPadding(widget.padding));
+          final itemSize = availableSpace / widget.items.length;
+
+          Widget navBar = ScrollConfiguration(
+            behavior:
+                ScrollConfiguration.of(context).copyWith(overscroll: false),
+            child: SizedBox(
+              width: maxWidth,
+              height: widget.height,
+              child: Container(
+                alignment: Alignment.center,
+                child: GestureDetector(
+                  onPanStart: widget.canScroll
+                      ? (_) {
+                          setState(() => _isDragging = true);
+                          _expansionController.forward();
+                          _wobbleController.stop();
+                          _snapController.stop();
+                          _dragWobbleController.repeat();
+                        }
+                      : null,
+                   onPanUpdate: widget.canScroll
+                      ? (details) {
+                          setState(() {
+                            final delta = isVertical
+                                ? details.delta.dy
+                                : details.delta.dx;
+                            _velocity = delta / itemSize;
+                            _dragPosition = (_dragPosition + _velocity).clamp(
+                              0.0,
+                              (widget.items.length - 1).toDouble(),
+                            );
+                          });
+                        }
+                      : null,
+                  onPanEnd: widget.canScroll
+                      ? (_) {
+                          setState(() {
+                            _isDragging = false;
+                            _velocity = 0;
+                          });
+                          _dragWobbleController.stop();
+                          _expansionController.reverse();
+                          final nearestTab = _dragPosition
+                              .round()
+                              .clamp(0, widget.items.length - 1);
+                          _animateTo(nearestTab);
+                          widget.onDrag?.call(nearestTab);
+                          _selectIndex(nearestTab);
+                        }
+                      : null,
+                  child: DecoratedBox(
                     decoration: BoxDecoration(
                       borderRadius: style.borderRadius,
-                      //border: style.resolveBorder(),
+                      boxShadow: style.boxShadow,
                     ),
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      alignment: Alignment.center,
-                      children: [
-                        Positioned.fill(
-                          child: ClipRRect(
-                            borderRadius: style.borderRadius!,
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(
-                                sigmaX: style.blurSigma ?? 0,
-                                sigmaY: style.blurSigma ?? 0,
+                    child: Container(
+                      height: innerHeight,
+                      decoration: BoxDecoration(
+                        borderRadius: style.borderRadius,
+                        //border: style.resolveBorder(),
+                      ),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.center,
+                        children: [
+                          Positioned.fill(
+                            child: ClipRRect(
+                              borderRadius: style.borderRadius!,
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(
+                                  sigmaX: style.blurSigma ?? 0,
+                                  sigmaY: style.blurSigma ?? 0,
+                                ),
+                                child: ColoredBox(color: style.containerColor!),
                               ),
-                              child: ColoredBox(color: style.containerColor!),
                             ),
                           ),
-                        ),
-                        Positioned.fill(
-                          child: AnimatedBuilder(
-                            animation: Listenable.merge([
-                              _expansionController,
-                              _snapController,
-                              _wobbleController,
-                              _dragWobbleController,
-                              _visualController,
-                            ]),
-                            builder: (context, _) {
-                              final wobbleVal = math.sin(
-                                      _wobbleController.value * math.pi * 4) *
-                                  (1 - _wobbleController.value) *
-                                  15.0;
-                              return CustomPaint(
-                                painter: _IOSLiquidPainter(
-                                  position: _dragPosition,
-                                  itemWidth: itemWidth,
-                                  velocity: _isDragging ? _velocity : 0,
-                                  expansion: _expansionController.value,
-                                  wobble: wobbleVal,
-                                  dragWobble: _isDragging
-                                      ? _dragWobbleController.value
-                                      : 0,
-                                  horizontalInset: resolvedPadding.left,
-                                  primaryColor: style.liquidColor!,
-                                  surfaceColor: style.containerColor!,
-                                  blobBaseWidthFactor:
-                                      widget.blobBaseWidthFactor,
-                                  blobExpandedWidthFactor:
-                                      widget.blobExpandedWidthFactor,
-                                  blobBaseHeight: widget.blobBaseHeight,
-                                  blobExpandedHeight: widget.blobExpandedHeight,
-                                  blobStretchMultiplier:
-                                      widget.blobStretchMultiplier,
-                                  blobMaxStretch: widget.blobMaxStretch,
-                                  blobWobbleInfluenceOnWidth:
-                                      _animatedBlobWobbleInfluenceOnWidth,
-                                  blobWobbleInfluenceOnHeight:
-                                      _animatedBlobWobbleInfluenceOnHeight,
-                                  shadowOffset: _animatedShadowOffset,
-                                  shadowAlpha: _animatedShadowAlpha,
-                                  shadowBlurSigma: _animatedShadowBlurSigma,
-                                  borderAlpha: _animatedBorderAlpha,
-                                  borderWidth: _animatedBorderWidth,
-                                  gradientSurfaceAlpha:
-                                      _animatedGradientSurfaceAlpha,
-                                  gradientPrimaryAlpha1:
-                                      _animatedGradientPrimaryAlpha1,
-                                  gradientPrimaryAlpha2:
-                                      _animatedGradientPrimaryAlpha2,
-                                  dragWaveHeightMultiplier:
-                                      _animatedDragWaveHeightMultiplier,
-                                  dragWavePositionMultiplier:
-                                      _animatedDragWavePositionMultiplier,
-                                  showBorder: widget.showBorder,
-                                  colorMode: widget.colorMode,
-                                  customGradientColors:
-                                      widget.customGradientColors,
-                                  borderColor: widget.borderColor,
-                                  borderGradientColors:
-                                      widget.borderGradientColors,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: widget.padding,
-                          child: Row(
-                            children:
-                                List.generate(widget.items.length, (index) {
-                              final item = widget.items[index];
-                              final distance = (index - _dragPosition).abs();
-                              final isSelected = index == safeIndex;
-
-                              final iconColor =
-                                  widget.items[index].colorIconNavBar ??
-                                      Color.lerp(
-                                        style.inactiveIconColor,
-                                        style.activeIconColor,
-                                        (1.0 - distance).clamp(0.0, 1.0),
-                                      );
-
-                              Widget iconWidget;
-                              switch (item.iconType) {
-                                case LiquidIconType.image:
-                                  final imagePath = isSelected
-                                      ? (item.activeImagePath ?? item.imagePath)
-                                      : (item.inactiveImagePath ??
-                                          item.imagePath);
-                                  iconWidget = imagePath != null
-                                      ? Image.asset(
-                                          imagePath,
-                                          width: widget.iconSize,
-                                          height: widget.iconSize,
-                                          color: iconColor,
-                                        )
-                                      : const SizedBox.shrink();
-                                  break;
-                                // case LiquidIconType.svg:
-                                //   final svgPath = item.svgPath;
-                                //   iconWidget = svgPath != null
-                                //       ? SvgIcon(
-                                //           assetName: svgPath,
-                                //           size: widget.iconSize,
-                                //           color: iconColor,
-                                //         )
-                                //       : const SizedBox.shrink();
-                                //   break;
-                                case LiquidIconType.iconData:
-                                  final iconData = isSelected
-                                      ? (widget.activeIcon?.call(item) ??
-                                          item.activeIcon ??
-                                          item.icon)
-                                      : (widget.inactiveIcon?.call(item) ??
-                                          item.inactiveIcon ??
-                                          item.icon);
-                                  iconWidget = Icon(
-                                    iconData,
-                                    size: widget.iconSize,
-                                    color: iconColor,
-                                  );
-                                  break;
-                                case LiquidIconType.widget:
-                                  iconWidget = item.customWidget ??
-                                      const SizedBox.shrink();
-                                  break;
-                                // case LiquidIconType.svgx:
-                                //   final svgxPath = item.svgxPath;
-                                //   iconWidget = svgxPath != null
-                                //       ? SvgPicture.asset(
-                                //           svgxPath,
-                                //           width: widget.iconSize,
-                                //           height: widget.iconSize,
-                                //           colorFilter: ColorFilter.mode(
-                                //             iconColor ?? Colors.black,
-                                //             BlendMode.srcIn,
-                                //           ),
-                                //         )
-                                //       : const SizedBox.shrink();
-                                //   break;
-                              }
-
-                              return Expanded(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    _selectIndex(index);
-                                    _animateTo(index);
-                                  },
-                                  behavior: HitTestBehavior.opaque,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Stack(
-                                        clipBehavior: Clip.none,
-                                        children: [
-                                          iconWidget,
-                                          if (_showBadge(index))
-                                            Positioned(
-                                              right: -6,
-                                              top: -6,
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(2),
-                                                decoration: BoxDecoration(
-                                                  color: widget.badgeColor,
-                                                  shape: BoxShape.circle,
-                                                  // border: Border.all(
-                                                  //   color: widget
-                                                  //           .badgeBorderColor ??
-                                                  //       style.containerColor!,
-                                                  //   width: 1.5,
-                                                  // ),
-                                                ),
-                                                constraints:
-                                                    const BoxConstraints(
-                                                  minWidth: 16,
-                                                  minHeight: 16,
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    '${widget.badges![index]}',
-                                                    style: widget
-                                                            .badgeTextStyle ??
-                                                        TextStyle(
-                                                          color: widget
-                                                              .badgeTextColor,
-                                                          fontSize: 8,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          height: 1,
-                                                        ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                      if (style.showLabel &&
-                                          (item.label?.isNotEmpty ?? false))
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 2),
-                                          child: Text(
-                                            item.label!,
-                                            style: TextStyle(
-                                                fontSize: 9,
-                                                color: isSelected
-                                                    ? item.colorSelected
-                                                    : item.colorUnselected),
-                                          ),
-                                        ),
-                                    ],
+                          Positioned.fill(
+                            child: AnimatedBuilder(
+                              animation: Listenable.merge([
+                                _expansionController,
+                                _snapController,
+                                _wobbleController,
+                                _dragWobbleController,
+                                _visualController,
+                              ]),
+                              builder: (context, _) {
+                                final wobbleVal = math.sin(
+                                        _wobbleController.value * math.pi * 4) *
+                                    (1 - _wobbleController.value) *
+                                    15.0;
+                                return CustomPaint(
+                                  painter: _IOSLiquidPainter(
+                                    position: _dragPosition,
+                                    itemWidth: itemSize,
+                                    velocity: _isDragging ? _velocity : 0,
+                                    expansion: _expansionController.value,
+                                    wobble: wobbleVal,
+                                    dragWobble: _isDragging
+                                        ? _dragWobbleController.value
+                                        : 0,
+                                    horizontalInset: resolvedPadding.left,
+                                    primaryColor: style.liquidColor!,
+                                    surfaceColor: style.containerColor!,
+                                    blobBaseWidthFactor:
+                                        widget.blobBaseWidthFactor,
+                                    blobExpandedWidthFactor:
+                                        widget.blobExpandedWidthFactor,
+                                    blobBaseHeight: widget.blobBaseHeight,
+                                    blobExpandedHeight:
+                                        widget.blobExpandedHeight,
+                                    blobStretchMultiplier:
+                                        widget.blobStretchMultiplier,
+                                    blobMaxStretch: widget.blobMaxStretch,
+                                    blobWobbleInfluenceOnWidth:
+                                        _animatedBlobWobbleInfluenceOnWidth,
+                                    blobWobbleInfluenceOnHeight:
+                                        _animatedBlobWobbleInfluenceOnHeight,
+                                    shadowOffset: _animatedShadowOffset,
+                                    shadowAlpha: _animatedShadowAlpha,
+                                    shadowBlurSigma: _animatedShadowBlurSigma,
+                                    borderAlpha: _animatedBorderAlpha,
+                                    borderWidth: _animatedBorderWidth,
+                                    gradientSurfaceAlpha:
+                                        _animatedGradientSurfaceAlpha,
+                                    gradientPrimaryAlpha1:
+                                        _animatedGradientPrimaryAlpha1,
+                                    gradientPrimaryAlpha2:
+                                        _animatedGradientPrimaryAlpha2,
+                                    dragWaveHeightMultiplier:
+                                        _animatedDragWaveHeightMultiplier,
+                                    dragWavePositionMultiplier:
+                                        _animatedDragWavePositionMultiplier,
+                                    showBorder: widget.showBorder,
+                                    isVertical: isVertical,
+                                    colorMode: widget.colorMode,
+                                    customGradientColors:
+                                        widget.customGradientColors,
+                                    borderColor: widget.borderColor,
+                                    borderGradientColors:
+                                        widget.borderGradientColors,
                                   ),
-                                ),
-                              );
-                            }),
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                      ],
+                          Padding(
+                            padding: widget.padding,
+                            child: SingleChildScrollView(
+                              scrollDirection: widget.scrollDirection,
+                              physics: widget.canScroll
+                                  ? const NeverScrollableScrollPhysics()
+                                  : const ClampingScrollPhysics(),
+                              child: _buildItemList(
+                                isVertical: isVertical,
+                                safeIndex: safeIndex,
+                                style: style,
+                                itemSize: itemSize,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -982,5 +869,187 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
           (_targetBlobWobbleInfluenceOnHeight ??
               widget.blobWobbleInfluenceOnHeight);
     });
+  }
+
+  Widget _buildItemList({
+    required bool isVertical,
+    required int safeIndex,
+    required LiquidNavStyle style,
+    required double itemSize,
+  }) {
+    return Flex(
+      direction: isVertical ? Axis.vertical : Axis.horizontal,
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(widget.items.length, (index) {
+        final item = widget.items[index];
+        final distance = (index - _dragPosition).abs();
+        final isSelected = index == safeIndex;
+
+        final iconColor =
+            widget.items[index].colorIconNavBar ??
+                Color.lerp(
+                  style.inactiveIconColor,
+                  style.activeIconColor,
+                  (1.0 - distance).clamp(0.0, 1.0),
+                );
+
+        Widget iconWidget;
+        switch (item.iconType) {
+          case LiquidIconType.image:
+            final imagePath = isSelected
+                ? (item.activeImagePath ?? item.imagePath)
+                : (item.inactiveImagePath ?? item.imagePath);
+            iconWidget = imagePath != null
+                ? Image.asset(
+                    imagePath,
+                    width: widget.iconSize,
+                    height: widget.iconSize,
+                    color: iconColor,
+                  )
+                : const SizedBox.shrink();
+            break;
+          case LiquidIconType.iconData:
+            final iconData = isSelected
+                ? (widget.activeIcon?.call(item) ??
+                    item.activeIcon ??
+                    item.icon)
+                : (widget.inactiveIcon?.call(item) ??
+                    item.inactiveIcon ??
+                    item.icon);
+            iconWidget = Icon(
+              iconData,
+              size: widget.iconSize,
+              color: iconColor,
+            );
+            break;
+          case LiquidIconType.widget:
+            iconWidget = item.customWidget ??
+                const SizedBox.shrink();
+            break;
+        }
+
+        final itemConstraints = isVertical
+            ? BoxConstraints.tightFor(height: itemSize)
+            : BoxConstraints.tightFor(width: itemSize);
+
+        return ConstrainedBox(
+          constraints: itemConstraints,
+          child: GestureDetector(
+            onTap: () {
+              _selectIndex(index);
+              _animateTo(index);
+            },
+            behavior: HitTestBehavior.opaque,
+            child: _buildItemContent(
+              isVertical: isVertical,
+              isSelected: isSelected,
+              iconWidget: iconWidget,
+              index: index,
+              style: style,
+              item: item,
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildItemContent({
+    required bool isVertical,
+    required bool isSelected,
+    required Widget iconWidget,
+    required int index,
+    required LiquidNavStyle style,
+    required LiquidNavItem item,
+  }) {
+    if (isVertical) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              iconWidget,
+              if (_showBadge(index))
+                Positioned(
+                  right: -6,
+                  top: -6,
+                  child: _buildBadge(index),
+                ),
+            ],
+          ),
+          if (style.showLabel && (item.label?.isNotEmpty ?? false))
+            Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: Text(
+                item.label!,
+                style: TextStyle(
+                  fontSize: 9,
+                  color: isSelected
+                      ? item.colorSelected
+                      : item.colorUnselected,
+                ),
+              ),
+            ),
+        ],
+      );
+    }
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            iconWidget,
+            if (_showBadge(index))
+              Positioned(
+                right: -6,
+                top: -6,
+                child: _buildBadge(index),
+              ),
+          ],
+        ),
+        if (style.showLabel && (item.label?.isNotEmpty ?? false))
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Text(
+              item.label!,
+              style: TextStyle(
+                fontSize: 9,
+                color: isSelected
+                    ? item.colorSelected
+                    : item.colorUnselected,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildBadge(int index) {
+    return Container(
+      padding: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        color: widget.badgeColor,
+        shape: BoxShape.circle,
+      ),
+      constraints: const BoxConstraints(
+        minWidth: 16,
+        minHeight: 16,
+      ),
+      child: Center(
+        child: Text(
+          '${widget.badges![index]}',
+          style: widget.badgeTextStyle ??
+              TextStyle(
+                color: widget.badgeTextColor,
+                fontSize: 8,
+                fontWeight: FontWeight.bold,
+                height: 1,
+              ),
+        ),
+      ),
+    );
   }
 }
