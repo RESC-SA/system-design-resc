@@ -92,6 +92,13 @@ class LiquidBottomNavBar extends StatefulWidget {
   final bool canScroll;
   final Axis scrollDirection;
   final LiquidColorMode colorMode;
+
+  /// Called when an item is dragged to a new position.
+  /// Receives (oldIndex, newIndex) — the parent should reorder [items] accordingly.
+  final ReorderCallback? onReorder;
+
+  /// Wraps each item during a reorder drag. Default scales to 1.5x.
+  final ReorderItemProxyDecorator? proxyDecorator;
   final List<Color>? customGradientColors;
   final Color? borderColor;
   final List<Color>? borderGradientColors;
@@ -152,6 +159,8 @@ class LiquidBottomNavBar extends StatefulWidget {
     this.canScroll = true,
     this.scrollDirection = Axis.horizontal,
     this.colorMode = LiquidColorMode.gradient,
+    this.onReorder,
+    this.proxyDecorator,
     this.customGradientColors,
     this.borderColor,
     this.borderGradientColors,
@@ -376,6 +385,8 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
 
   double _dragPosition = 0;
   bool _isDragging = false;
+  bool _isReordering = false;
+  final ScrollController _reorderScrollController = ScrollController();
   double _velocity = 0;
   double? _snapTarget;
   Animation<double>? _currentAnimation;
@@ -498,9 +509,9 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
               height: widget.height,
               child: Container(
                 alignment: Alignment.center,
-                child: GestureDetector(
-                  onPanStart: widget.canScroll
-                      ? (_) {
+                  child: GestureDetector(
+                onPanStart: widget.canScroll && !_isReordering
+                    ? (_) {
                           setState(() => _isDragging = true);
                           _expansionController.forward();
                           _wobbleController.stop();
@@ -508,7 +519,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                           _dragWobbleController.repeat();
                         }
                       : null,
-                   onPanUpdate: widget.canScroll
+                   onPanUpdate: widget.canScroll && !_isReordering
                       ? (details) {
                           setState(() {
                             final delta = isVertical
@@ -522,7 +533,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                           });
                         }
                       : null,
-                  onPanEnd: widget.canScroll
+                   onPanEnd: widget.canScroll && !_isReordering
                       ? (_) {
                           setState(() {
                             _isDragging = false;
@@ -636,17 +647,105 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                           ),
                           Padding(
                             padding: widget.padding,
-                            child: SingleChildScrollView(
+                            child: ReorderableListView.builder(
+                              scrollController: _reorderScrollController,
+                              padding: EdgeInsets.zero,
                               scrollDirection: widget.scrollDirection,
-                              physics: widget.canScroll
-                                  ? const NeverScrollableScrollPhysics()
-                                  : const ClampingScrollPhysics(),
-                              child: _buildItemList(
-                                isVertical: isVertical,
-                                safeIndex: safeIndex,
-                                style: style,
-                                itemSize: itemSize,
-                              ),
+                              proxyDecorator: widget.proxyDecorator ??
+                                  (child, index, animation) =>
+                                      ScaleTransition(
+                                        scale: animation.drive(
+                                          Tween(begin: 1.0, end: 1.5),
+                                        ),
+                                        child: child,
+                                      ),
+                              itemCount: widget.items.length,
+                              onReorder: (oldIndex, newIndex) {
+                                widget.onReorder?.call(oldIndex, newIndex);
+                              },
+                              onReorderStart: (_) {
+                                setState(() => _isReordering = true);
+                              },
+                              onReorderEnd: (_) {
+                                setState(() => _isReordering = false);
+                              },
+                              itemBuilder: (context, index) {
+                                final item = widget.items[index];
+                                final distance =
+                                    (index - _dragPosition).abs();
+                                final isSelected = index == safeIndex;
+
+                                final iconColor =
+                                    widget.items[index].colorIconNavBar ??
+                                        Color.lerp(
+                                          style.inactiveIconColor,
+                                          style.activeIconColor,
+                                          (1.0 - distance).clamp(0.0, 1.0),
+                                        );
+
+                                Widget iconWidget;
+                                switch (item.iconType) {
+                                  case LiquidIconType.image:
+                                    final imagePath = isSelected
+                                        ? (item.activeImagePath ??
+                                            item.imagePath)
+                                        : (item.inactiveImagePath ??
+                                            item.imagePath);
+                                    iconWidget = imagePath != null
+                                        ? Image.asset(
+                                            imagePath,
+                                            width: widget.iconSize,
+                                            height: widget.iconSize,
+                                            color: iconColor,
+                                          )
+                                        : const SizedBox.shrink();
+                                    break;
+                                  case LiquidIconType.iconData:
+                                    final iconData = isSelected
+                                        ? (widget.activeIcon?.call(item) ??
+                                            item.activeIcon ??
+                                            item.icon)
+                                        : (widget.inactiveIcon?.call(item) ??
+                                            item.inactiveIcon ??
+                                            item.icon);
+                                    iconWidget = Icon(
+                                      iconData,
+                                      size: widget.iconSize,
+                                      color: iconColor,
+                                    );
+                                    break;
+                                  case LiquidIconType.widget:
+                                    iconWidget = item.customWidget ??
+                                        const SizedBox.shrink();
+                                    break;
+                                }
+
+                                final itemConstraints = isVertical
+                                    ? BoxConstraints.tightFor(
+                                        height: itemSize)
+                                    : BoxConstraints.tightFor(
+                                        width: itemSize);
+
+                                return ConstrainedBox(
+                                  key: ValueKey(index),
+                                  constraints: itemConstraints,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _selectIndex(index);
+                                      _animateTo(index);
+                                    },
+                                    behavior: HitTestBehavior.opaque,
+                                    child: _buildItemContent(
+                                      isVertical: isVertical,
+                                      isSelected: isSelected,
+                                      iconWidget: iconWidget,
+                                      index: index,
+                                      style: style,
+                                      item: item,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ],
@@ -688,6 +787,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
     _wobbleController.dispose();
     _dragWobbleController.dispose();
     _visualController.dispose();
+    _reorderScrollController.dispose();
     super.dispose();
   }
 
@@ -869,89 +969,6 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
           (_targetBlobWobbleInfluenceOnHeight ??
               widget.blobWobbleInfluenceOnHeight);
     });
-  }
-
-  Widget _buildItemList({
-    required bool isVertical,
-    required int safeIndex,
-    required LiquidNavStyle style,
-    required double itemSize,
-  }) {
-    return Flex(
-      direction: isVertical ? Axis.vertical : Axis.horizontal,
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(widget.items.length, (index) {
-        final item = widget.items[index];
-        final distance = (index - _dragPosition).abs();
-        final isSelected = index == safeIndex;
-
-        final iconColor =
-            widget.items[index].colorIconNavBar ??
-                Color.lerp(
-                  style.inactiveIconColor,
-                  style.activeIconColor,
-                  (1.0 - distance).clamp(0.0, 1.0),
-                );
-
-        Widget iconWidget;
-        switch (item.iconType) {
-          case LiquidIconType.image:
-            final imagePath = isSelected
-                ? (item.activeImagePath ?? item.imagePath)
-                : (item.inactiveImagePath ?? item.imagePath);
-            iconWidget = imagePath != null
-                ? Image.asset(
-                    imagePath,
-                    width: widget.iconSize,
-                    height: widget.iconSize,
-                    color: iconColor,
-                  )
-                : const SizedBox.shrink();
-            break;
-          case LiquidIconType.iconData:
-            final iconData = isSelected
-                ? (widget.activeIcon?.call(item) ??
-                    item.activeIcon ??
-                    item.icon)
-                : (widget.inactiveIcon?.call(item) ??
-                    item.inactiveIcon ??
-                    item.icon);
-            iconWidget = Icon(
-              iconData,
-              size: widget.iconSize,
-              color: iconColor,
-            );
-            break;
-          case LiquidIconType.widget:
-            iconWidget = item.customWidget ??
-                const SizedBox.shrink();
-            break;
-        }
-
-        final itemConstraints = isVertical
-            ? BoxConstraints.tightFor(height: itemSize)
-            : BoxConstraints.tightFor(width: itemSize);
-
-        return ConstrainedBox(
-          constraints: itemConstraints,
-          child: GestureDetector(
-            onTap: () {
-              _selectIndex(index);
-              _animateTo(index);
-            },
-            behavior: HitTestBehavior.opaque,
-            child: _buildItemContent(
-              isVertical: isVertical,
-              isSelected: isSelected,
-              iconWidget: iconWidget,
-              index: index,
-              style: style,
-              item: item,
-            ),
-          ),
-        );
-      }),
-    );
   }
 
   Widget _buildItemContent({
