@@ -270,12 +270,8 @@ class _IOSLiquidPainter extends CustomPainter {
         math.sin(dragWobble * math.pi * 2) * velocity.abs().clamp(0.0, 1.0);
     currentHeight += dragWave * dragWaveHeightMultiplier;
 
-    final dx = isVertical
-        ? 0.0
-        : dragWave * dragWavePositionMultiplier;
-    final dy = isVertical
-        ? dragWave * dragWavePositionMultiplier
-        : 0.0;
+    final dx = isVertical ? 0.0 : dragWave * dragWavePositionMultiplier;
+    final dy = isVertical ? dragWave * dragWavePositionMultiplier : 0.0;
 
     final rect = Rect.fromCenter(
       center: Offset(centerX + dx, centerY + dy),
@@ -499,8 +495,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
           final innerHeight =
               math.max(48.0, widget.height - resolvedPadding.vertical);
 
-          final visibleCount =
-              math.min(_maxItemDisplayed, widget.items.length);
+          final visibleCount = math.min(_maxItemDisplayed, widget.items.length);
           final cellSize = isVertical
               ? math.max(1.0, innerHeight / visibleCount)
               : math.max(0.0, maxWidth / visibleCount);
@@ -513,9 +508,9 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
               height: widget.height,
               child: Container(
                 alignment: Alignment.center,
-                  child: GestureDetector(
-                onPanStart: !_isReordering
-                    ? (_) {
+                child: GestureDetector(
+                  onPanStart: !_isReordering
+                      ? (_) {
                           setState(() => _isDragging = true);
                           _expansionController.forward();
                           _wobbleController.stop();
@@ -523,7 +518,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                           _dragWobbleController.repeat();
                         }
                       : null,
-                   onPanUpdate: !_isReordering
+                  onPanUpdate: !_isReordering
                       ? (details) {
                           setState(() {
                             final delta = isVertical
@@ -537,7 +532,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                           });
                         }
                       : null,
-                   onPanEnd: !_isReordering
+                  onPanEnd: !_isReordering
                       ? (_) {
                           setState(() {
                             _isDragging = false;
@@ -594,56 +589,58 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                         _wobbleController.value * math.pi * 4) *
                                     (1 - _wobbleController.value) *
                                     15.0;
-                                return CustomPaint(
-                                  painter: _IOSLiquidPainter(
-                                     position: _dragPosition,
-                                    itemWidth: cellSize,
-                                    velocity: _isDragging ? _velocity : 0,
-                                    expansion: _expansionController.value,
-                                    wobble: wobbleVal,
-                                    dragWobble: _isDragging
-                                        ? _dragWobbleController.value
-                                        : 0,
-                                    horizontalInset: resolvedPadding.left,
-                                    primaryColor: style.liquidColor!,
-                                    surfaceColor: style.containerColor!,
-                                    blobBaseWidthFactor:
-                                        widget.blobBaseWidthFactor,
-                                    blobExpandedWidthFactor:
-                                        widget.blobExpandedWidthFactor,
-                                    blobBaseHeight: widget.blobBaseHeight,
-                                    blobExpandedHeight:
-                                        widget.blobExpandedHeight,
-                                    blobStretchMultiplier:
-                                        widget.blobStretchMultiplier,
-                                    blobMaxStretch: widget.blobMaxStretch,
-                                    blobWobbleInfluenceOnWidth:
-                                        _animatedBlobWobbleInfluenceOnWidth,
-                                    blobWobbleInfluenceOnHeight:
-                                        _animatedBlobWobbleInfluenceOnHeight,
-                                    shadowOffset: _animatedShadowOffset,
-                                    shadowAlpha: _animatedShadowAlpha,
-                                    shadowBlurSigma: _animatedShadowBlurSigma,
-                                    borderAlpha: _animatedBorderAlpha,
-                                    borderWidth: _animatedBorderWidth,
-                                    gradientSurfaceAlpha:
-                                        _animatedGradientSurfaceAlpha,
-                                    gradientPrimaryAlpha1:
-                                        _animatedGradientPrimaryAlpha1,
-                                    gradientPrimaryAlpha2:
-                                        _animatedGradientPrimaryAlpha2,
-                                    dragWaveHeightMultiplier:
-                                        _animatedDragWaveHeightMultiplier,
-                                    dragWavePositionMultiplier:
-                                        _animatedDragWavePositionMultiplier,
-                                    showBorder: widget.showBorder,
-                                    isVertical: isVertical,
-                                    colorMode: widget.colorMode,
-                                    customGradientColors:
-                                        widget.customGradientColors,
-                                    borderColor: widget.borderColor,
-                                    borderGradientColors:
-                                        widget.borderGradientColors,
+                                return Center(
+                                  child: CustomPaint(
+                                    painter: _IOSLiquidPainter(
+                                      position: _dragPosition,
+                                      itemWidth: cellSize,
+                                      velocity: _isDragging ? _velocity : 0,
+                                      expansion: _expansionController.value,
+                                      wobble: wobbleVal,
+                                      dragWobble: _isDragging
+                                          ? _dragWobbleController.value
+                                          : 0,
+                                      horizontalInset: resolvedPadding.left,
+                                      primaryColor: style.liquidColor!,
+                                      surfaceColor: style.containerColor!,
+                                      blobBaseWidthFactor:
+                                          widget.blobBaseWidthFactor,
+                                      blobExpandedWidthFactor:
+                                          widget.blobExpandedWidthFactor,
+                                      blobBaseHeight: widget.blobBaseHeight,
+                                      blobExpandedHeight:
+                                          widget.blobExpandedHeight,
+                                      blobStretchMultiplier:
+                                          widget.blobStretchMultiplier,
+                                      blobMaxStretch: widget.blobMaxStretch,
+                                      blobWobbleInfluenceOnWidth:
+                                          _animatedBlobWobbleInfluenceOnWidth,
+                                      blobWobbleInfluenceOnHeight:
+                                          _animatedBlobWobbleInfluenceOnHeight,
+                                      shadowOffset: _animatedShadowOffset,
+                                      shadowAlpha: _animatedShadowAlpha,
+                                      shadowBlurSigma: _animatedShadowBlurSigma,
+                                      borderAlpha: _animatedBorderAlpha,
+                                      borderWidth: _animatedBorderWidth,
+                                      gradientSurfaceAlpha:
+                                          _animatedGradientSurfaceAlpha,
+                                      gradientPrimaryAlpha1:
+                                          _animatedGradientPrimaryAlpha1,
+                                      gradientPrimaryAlpha2:
+                                          _animatedGradientPrimaryAlpha2,
+                                      dragWaveHeightMultiplier:
+                                          _animatedDragWaveHeightMultiplier,
+                                      dragWavePositionMultiplier:
+                                          _animatedDragWavePositionMultiplier,
+                                      showBorder: widget.showBorder,
+                                      isVertical: isVertical,
+                                      colorMode: widget.colorMode,
+                                      customGradientColors:
+                                          widget.customGradientColors,
+                                      borderColor: widget.borderColor,
+                                      borderGradientColors:
+                                          widget.borderGradientColors,
+                                    ),
                                   ),
                                 );
                               },
@@ -762,9 +759,234 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
     _snapController.forward(from: 0);
   }
 
+  Widget _buildBadge(int index) {
+    return Container(
+      padding: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        color: widget.badgeColor,
+        shape: BoxShape.circle,
+      ),
+      constraints: const BoxConstraints(
+        minWidth: 16,
+        minHeight: 16,
+      ),
+      child: Center(
+        child: Text(
+          '${widget.badges![index]}',
+          style: widget.badgeTextStyle ??
+              TextStyle(
+                color: widget.badgeTextColor,
+                fontSize: 8,
+                fontWeight: FontWeight.bold,
+                height: 1,
+              ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildItemContent({
+    required bool isVertical,
+    required bool isSelected,
+    required Widget iconWidget,
+    required int index,
+    required LiquidNavStyle style,
+    required LiquidNavItem item,
+  }) {
+    if (isVertical) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              iconWidget,
+              if (_showBadge(index))
+                Positioned(
+                  right: -6,
+                  top: -6,
+                  child: _buildBadge(index),
+                ),
+            ],
+          ),
+          if (style.showLabel && (item.label?.isNotEmpty ?? false))
+            Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: Text(
+                item.label!,
+                style: TextStyle(
+                  fontSize: 9,
+                  color: isSelected ? item.colorSelected : item.colorUnselected,
+                ),
+              ),
+            ),
+        ],
+      );
+    }
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            iconWidget,
+            if (_showBadge(index))
+              Positioned(
+                right: -6,
+                top: -6,
+                child: _buildBadge(index),
+              ),
+          ],
+        ),
+        if (style.showLabel && (item.label?.isNotEmpty ?? false))
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Text(
+              item.label!,
+              style: TextStyle(
+                fontSize: 9,
+                color: isSelected ? item.colorSelected : item.colorUnselected,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildScrollableList({
+    required bool isVertical,
+    required int safeIndex,
+    required LiquidNavStyle style,
+    required double cellSize,
+  }) {
+    final overflow = widget.items.length > _maxItemDisplayed;
+    final pad = overflow ? cellSize / 2 : 0.0;
+    final padding = isVertical
+        ? EdgeInsets.symmetric(vertical: pad)
+        : EdgeInsets.symmetric(horizontal: pad);
+
+    Widget Function(BuildContext, int) itemBuilder = (context, index) {
+      final item = widget.items[index];
+      final distance = (index - _dragPosition).abs();
+      final isSelected = index == safeIndex;
+
+      final iconColor = widget.items[index].colorIconNavBar ??
+          Color.lerp(
+            style.inactiveIconColor,
+            style.activeIconColor,
+            (1.0 - distance).clamp(0.0, 1.0),
+          );
+
+      Widget iconWidget;
+      switch (item.iconType) {
+        case LiquidIconType.image:
+          final imagePath = isSelected
+              ? (item.activeImagePath ?? item.imagePath)
+              : (item.inactiveImagePath ?? item.imagePath);
+          iconWidget = imagePath != null
+              ? Image.asset(
+                  imagePath,
+                  width: widget.iconSize,
+                  height: widget.iconSize,
+                  color: iconColor,
+                )
+              : const SizedBox.shrink();
+          break;
+        case LiquidIconType.iconData:
+          final iconData = isSelected
+              ? (widget.activeIcon?.call(item) ?? item.activeIcon ?? item.icon)
+              : (widget.inactiveIcon?.call(item) ??
+                  item.inactiveIcon ??
+                  item.icon);
+          iconWidget = Icon(
+            iconData,
+            size: widget.iconSize,
+            color: iconColor,
+          );
+          break;
+        case LiquidIconType.widget:
+          iconWidget = item.customWidget ?? const SizedBox.shrink();
+          break;
+      }
+
+      final itemConstraints = isVertical
+          ? BoxConstraints.tightFor(height: cellSize)
+          : BoxConstraints.tightFor(width: cellSize);
+
+      return ConstrainedBox(
+        key: ValueKey('nav_item_$index'),
+        constraints: itemConstraints,
+        child: GestureDetector(
+          onTap: () => _onTapItem(index),
+          behavior: HitTestBehavior.opaque,
+          child: _buildItemContent(
+            isVertical: isVertical,
+            isSelected: isSelected,
+            iconWidget: iconWidget,
+            index: index,
+            style: style,
+            item: item,
+          ),
+        ),
+      );
+    };
+
+    final onReorder = widget.onReorder;
+    if (onReorder != null) {
+      return ReorderableListView.builder(
+        scrollController: _scrollController,
+        padding: padding,
+        scrollDirection: widget.scrollDirection,
+        proxyDecorator: widget.proxyDecorator ??
+            (child, index, animation) => ScaleTransition(
+                  scale: animation.drive(Tween(begin: 1.0, end: 1.5)),
+                  child: child,
+                ),
+        itemCount: widget.items.length,
+        onReorder: onReorder,
+        onReorderStart: (_) => setState(() => _isReordering = true),
+        onReorderEnd: (_) => setState(() => _isReordering = false),
+        itemBuilder: itemBuilder,
+      );
+    }
+
+    return ListView.builder(
+      controller: _scrollController,
+      padding: padding,
+      itemCount: widget.items.length,
+      scrollDirection: widget.scrollDirection,
+      itemBuilder: itemBuilder,
+    );
+  }
+
+  void _centerFocusItem(int index) {
+    if (widget.items.length <= _maxItemDisplayed) return;
+    final cellSize = _scrollController.position.viewportDimension /
+        math.min(_maxItemDisplayed, widget.items.length);
+    final scrollable = widget.scrollDirection == Axis.vertical;
+    final gap = cellSize / 2;
+    final target = (cellSize * index) - (cellSize * 2) + gap;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final offset = math.max(0.0, math.min(target + gap, maxScroll));
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        scrollable ? offset : offset,
+        duration: widget.animationDuration,
+        curve: widget.curve,
+      );
+    }
+  }
+
   double _horizontalPadding(EdgeInsetsGeometry geometry) {
     final resolved = geometry.resolve(Directionality.of(context));
     return resolved.left + resolved.right;
+  }
+
+  void _onTapItem(int index) {
+    _centerFocusItem(index);
+    _selectIndex(index);
+    _animateTo(index);
   }
 
   void _removeSnapListener() {
@@ -879,236 +1101,5 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
           (_targetBlobWobbleInfluenceOnHeight ??
               widget.blobWobbleInfluenceOnHeight);
     });
-  }
-
-  void _onTapItem(int index) {
-    _centerFocusItem(index);
-    _selectIndex(index);
-    _animateTo(index);
-  }
-
-  void _centerFocusItem(int index) {
-    if (widget.items.length <= _maxItemDisplayed) return;
-    final cellSize = _scrollController.position.viewportDimension /
-        math.min(_maxItemDisplayed, widget.items.length);
-    final scrollable = widget.scrollDirection == Axis.vertical;
-    final gap = cellSize / 2;
-    final target = (cellSize * index) - (cellSize * 2) + gap;
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final offset = math.max(0.0, math.min(target + gap, maxScroll));
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        scrollable ? offset : offset,
-        duration: widget.animationDuration,
-        curve: widget.curve,
-      );
-    }
-  }
-
-  Widget _buildScrollableList({
-    required bool isVertical,
-    required int safeIndex,
-    required LiquidNavStyle style,
-    required double cellSize,
-  }) {
-    final overflow = widget.items.length > _maxItemDisplayed;
-    final pad = overflow ? cellSize / 2 : 0.0;
-    final padding = isVertical
-        ? EdgeInsets.symmetric(vertical: pad)
-        : EdgeInsets.symmetric(horizontal: pad);
-
-    Widget Function(BuildContext, int) itemBuilder = (context, index) {
-      final item = widget.items[index];
-      final distance = (index - _dragPosition).abs();
-      final isSelected = index == safeIndex;
-
-      final iconColor = widget.items[index].colorIconNavBar ??
-          Color.lerp(
-            style.inactiveIconColor,
-            style.activeIconColor,
-            (1.0 - distance).clamp(0.0, 1.0),
-          );
-
-      Widget iconWidget;
-      switch (item.iconType) {
-        case LiquidIconType.image:
-          final imagePath = isSelected
-              ? (item.activeImagePath ?? item.imagePath)
-              : (item.inactiveImagePath ?? item.imagePath);
-          iconWidget = imagePath != null
-              ? Image.asset(
-                  imagePath,
-                  width: widget.iconSize,
-                  height: widget.iconSize,
-                  color: iconColor,
-                )
-              : const SizedBox.shrink();
-          break;
-        case LiquidIconType.iconData:
-          final iconData = isSelected
-              ? (widget.activeIcon?.call(item) ??
-                  item.activeIcon ??
-                  item.icon)
-              : (widget.inactiveIcon?.call(item) ??
-                  item.inactiveIcon ??
-                  item.icon);
-          iconWidget = Icon(
-            iconData,
-            size: widget.iconSize,
-            color: iconColor,
-          );
-          break;
-        case LiquidIconType.widget:
-          iconWidget = item.customWidget ?? const SizedBox.shrink();
-          break;
-      }
-
-      final itemConstraints = isVertical
-          ? BoxConstraints.tightFor(height: cellSize)
-          : BoxConstraints.tightFor(width: cellSize);
-
-      return ConstrainedBox(
-        key: ValueKey('nav_item_$index'),
-        constraints: itemConstraints,
-        child: GestureDetector(
-          onTap: () => _onTapItem(index),
-          behavior: HitTestBehavior.opaque,
-          child: _buildItemContent(
-            isVertical: isVertical,
-            isSelected: isSelected,
-            iconWidget: iconWidget,
-            index: index,
-            style: style,
-            item: item,
-          ),
-        ),
-      );
-    };
-
-    final onReorder = widget.onReorder;
-    if (onReorder != null) {
-      return ReorderableListView.builder(
-        scrollController: _scrollController,
-        padding: padding,
-        scrollDirection: widget.scrollDirection,
-        proxyDecorator: widget.proxyDecorator ??
-            (child, index, animation) => ScaleTransition(
-                  scale: animation.drive(Tween(begin: 1.0, end: 1.5)),
-                  child: child,
-                ),
-        itemCount: widget.items.length,
-        onReorder: onReorder,
-        onReorderStart: (_) => setState(() => _isReordering = true),
-        onReorderEnd: (_) => setState(() => _isReordering = false),
-        itemBuilder: itemBuilder,
-      );
-    }
-
-    return ListView.builder(
-      controller: _scrollController,
-      padding: padding,
-      itemCount: widget.items.length,
-      scrollDirection: widget.scrollDirection,
-      itemBuilder: itemBuilder,
-    );
-  }
-
-  Widget _buildItemContent({
-    required bool isVertical,
-    required bool isSelected,
-    required Widget iconWidget,
-    required int index,
-    required LiquidNavStyle style,
-    required LiquidNavItem item,
-  }) {
-    if (isVertical) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              iconWidget,
-              if (_showBadge(index))
-                Positioned(
-                  right: -6,
-                  top: -6,
-                  child: _buildBadge(index),
-                ),
-            ],
-          ),
-          if (style.showLabel && (item.label?.isNotEmpty ?? false))
-            Padding(
-              padding: const EdgeInsets.only(left: 4),
-              child: Text(
-                item.label!,
-                style: TextStyle(
-                  fontSize: 9,
-                  color: isSelected
-                      ? item.colorSelected
-                      : item.colorUnselected,
-                ),
-              ),
-            ),
-        ],
-      );
-    }
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Stack(
-          clipBehavior: Clip.none,
-          children: [
-            iconWidget,
-            if (_showBadge(index))
-              Positioned(
-                right: -6,
-                top: -6,
-                child: _buildBadge(index),
-              ),
-          ],
-        ),
-        if (style.showLabel && (item.label?.isNotEmpty ?? false))
-          Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: Text(
-              item.label!,
-              style: TextStyle(
-                fontSize: 9,
-                color: isSelected
-                    ? item.colorSelected
-                    : item.colorUnselected,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildBadge(int index) {
-    return Container(
-      padding: const EdgeInsets.all(2),
-      decoration: BoxDecoration(
-        color: widget.badgeColor,
-        shape: BoxShape.circle,
-      ),
-      constraints: const BoxConstraints(
-        minWidth: 16,
-        minHeight: 16,
-      ),
-      child: Center(
-        child: Text(
-          '${widget.badges![index]}',
-          style: widget.badgeTextStyle ??
-              TextStyle(
-                color: widget.badgeTextColor,
-                fontSize: 8,
-                fontWeight: FontWeight.bold,
-                height: 1,
-              ),
-        ),
-      ),
-    );
   }
 }
