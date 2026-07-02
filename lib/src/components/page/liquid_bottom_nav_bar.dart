@@ -377,16 +377,19 @@ class _IOSLiquidPainter extends CustomPainter {
 
 class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
     with TickerProviderStateMixin {
+  static const int _maxItemDisplayed = 5;
+
   late final AnimationController _expansionController;
   late final AnimationController _snapController;
   late final AnimationController _wobbleController;
   late final AnimationController _dragWobbleController;
   late final AnimationController _visualController;
 
+  final ScrollController _scrollController = ScrollController();
+
   double _dragPosition = 0;
   bool _isDragging = false;
   bool _isReordering = false;
-  final ScrollController _reorderScrollController = ScrollController();
   double _velocity = 0;
   double? _snapTarget;
   Animation<double>? _currentAnimation;
@@ -496,10 +499,11 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
           final innerHeight =
               math.max(48.0, widget.height - resolvedPadding.vertical);
 
-          final availableSpace = isVertical
-              ? math.max(1.0, innerHeight - resolvedPadding.vertical)
-              : math.max(0.0, maxWidth - _horizontalPadding(widget.padding));
-          final itemSize = availableSpace / widget.items.length;
+          final visibleCount =
+              math.min(_maxItemDisplayed, widget.items.length);
+          final cellSize = isVertical
+              ? math.max(1.0, innerHeight / visibleCount)
+              : math.max(0.0, maxWidth / visibleCount);
 
           Widget navBar = ScrollConfiguration(
             behavior:
@@ -510,7 +514,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
               child: Container(
                 alignment: Alignment.center,
                   child: GestureDetector(
-                onPanStart: widget.canScroll && !_isReordering
+                onPanStart: !_isReordering
                     ? (_) {
                           setState(() => _isDragging = true);
                           _expansionController.forward();
@@ -519,13 +523,13 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                           _dragWobbleController.repeat();
                         }
                       : null,
-                   onPanUpdate: widget.canScroll && !_isReordering
+                   onPanUpdate: !_isReordering
                       ? (details) {
                           setState(() {
                             final delta = isVertical
                                 ? details.delta.dy
                                 : details.delta.dx;
-                            _velocity = delta / itemSize;
+                            _velocity = delta / cellSize;
                             _dragPosition = (_dragPosition + _velocity).clamp(
                               0.0,
                               (widget.items.length - 1).toDouble(),
@@ -533,7 +537,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                           });
                         }
                       : null,
-                   onPanEnd: widget.canScroll && !_isReordering
+                   onPanEnd: !_isReordering
                       ? (_) {
                           setState(() {
                             _isDragging = false;
@@ -592,8 +596,8 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                     15.0;
                                 return CustomPaint(
                                   painter: _IOSLiquidPainter(
-                                    position: _dragPosition,
-                                    itemWidth: itemSize,
+                                     position: _dragPosition,
+                                    itemWidth: cellSize,
                                     velocity: _isDragging ? _velocity : 0,
                                     expansion: _expansionController.value,
                                     wobble: wobbleVal,
@@ -647,105 +651,11 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                           ),
                           Padding(
                             padding: widget.padding,
-                            child: ReorderableListView.builder(
-                              scrollController: _reorderScrollController,
-                              padding: EdgeInsets.zero,
-                              scrollDirection: widget.scrollDirection,
-                              proxyDecorator: widget.proxyDecorator ??
-                                  (child, index, animation) =>
-                                      ScaleTransition(
-                                        scale: animation.drive(
-                                          Tween(begin: 1.0, end: 1.5),
-                                        ),
-                                        child: child,
-                                      ),
-                              itemCount: widget.items.length,
-                              onReorder: (oldIndex, newIndex) {
-                                widget.onReorder?.call(oldIndex, newIndex);
-                              },
-                              onReorderStart: (_) {
-                                setState(() => _isReordering = true);
-                              },
-                              onReorderEnd: (_) {
-                                setState(() => _isReordering = false);
-                              },
-                              itemBuilder: (context, index) {
-                                final item = widget.items[index];
-                                final distance =
-                                    (index - _dragPosition).abs();
-                                final isSelected = index == safeIndex;
-
-                                final iconColor =
-                                    widget.items[index].colorIconNavBar ??
-                                        Color.lerp(
-                                          style.inactiveIconColor,
-                                          style.activeIconColor,
-                                          (1.0 - distance).clamp(0.0, 1.0),
-                                        );
-
-                                Widget iconWidget;
-                                switch (item.iconType) {
-                                  case LiquidIconType.image:
-                                    final imagePath = isSelected
-                                        ? (item.activeImagePath ??
-                                            item.imagePath)
-                                        : (item.inactiveImagePath ??
-                                            item.imagePath);
-                                    iconWidget = imagePath != null
-                                        ? Image.asset(
-                                            imagePath,
-                                            width: widget.iconSize,
-                                            height: widget.iconSize,
-                                            color: iconColor,
-                                          )
-                                        : const SizedBox.shrink();
-                                    break;
-                                  case LiquidIconType.iconData:
-                                    final iconData = isSelected
-                                        ? (widget.activeIcon?.call(item) ??
-                                            item.activeIcon ??
-                                            item.icon)
-                                        : (widget.inactiveIcon?.call(item) ??
-                                            item.inactiveIcon ??
-                                            item.icon);
-                                    iconWidget = Icon(
-                                      iconData,
-                                      size: widget.iconSize,
-                                      color: iconColor,
-                                    );
-                                    break;
-                                  case LiquidIconType.widget:
-                                    iconWidget = item.customWidget ??
-                                        const SizedBox.shrink();
-                                    break;
-                                }
-
-                                final itemConstraints = isVertical
-                                    ? BoxConstraints.tightFor(
-                                        height: itemSize)
-                                    : BoxConstraints.tightFor(
-                                        width: itemSize);
-
-                                return ConstrainedBox(
-                                  key: ValueKey(index),
-                                  constraints: itemConstraints,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      _selectIndex(index);
-                                      _animateTo(index);
-                                    },
-                                    behavior: HitTestBehavior.opaque,
-                                    child: _buildItemContent(
-                                      isVertical: isVertical,
-                                      isSelected: isSelected,
-                                      iconWidget: iconWidget,
-                                      index: index,
-                                      style: style,
-                                      item: item,
-                                    ),
-                                  ),
-                                );
-                              },
+                            child: _buildScrollableList(
+                              isVertical: isVertical,
+                              safeIndex: safeIndex,
+                              style: style,
+                              cellSize: cellSize,
                             ),
                           ),
                         ],
@@ -787,7 +697,7 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
     _wobbleController.dispose();
     _dragWobbleController.dispose();
     _visualController.dispose();
-    _reorderScrollController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -969,6 +879,138 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
           (_targetBlobWobbleInfluenceOnHeight ??
               widget.blobWobbleInfluenceOnHeight);
     });
+  }
+
+  void _onTapItem(int index) {
+    _centerFocusItem(index);
+    _selectIndex(index);
+    _animateTo(index);
+  }
+
+  void _centerFocusItem(int index) {
+    if (widget.items.length <= _maxItemDisplayed) return;
+    final cellSize = _scrollController.position.viewportDimension /
+        math.min(_maxItemDisplayed, widget.items.length);
+    final scrollable = widget.scrollDirection == Axis.vertical;
+    final gap = cellSize / 2;
+    final target = (cellSize * index) - (cellSize * 2) + gap;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final offset = math.max(0.0, math.min(target + gap, maxScroll));
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        scrollable ? offset : offset,
+        duration: widget.animationDuration,
+        curve: widget.curve,
+      );
+    }
+  }
+
+  Widget _buildScrollableList({
+    required bool isVertical,
+    required int safeIndex,
+    required LiquidNavStyle style,
+    required double cellSize,
+  }) {
+    final overflow = widget.items.length > _maxItemDisplayed;
+    final pad = overflow ? cellSize / 2 : 0.0;
+    final padding = isVertical
+        ? EdgeInsets.symmetric(vertical: pad)
+        : EdgeInsets.symmetric(horizontal: pad);
+
+    Widget Function(BuildContext, int) itemBuilder = (context, index) {
+      final item = widget.items[index];
+      final distance = (index - _dragPosition).abs();
+      final isSelected = index == safeIndex;
+
+      final iconColor = widget.items[index].colorIconNavBar ??
+          Color.lerp(
+            style.inactiveIconColor,
+            style.activeIconColor,
+            (1.0 - distance).clamp(0.0, 1.0),
+          );
+
+      Widget iconWidget;
+      switch (item.iconType) {
+        case LiquidIconType.image:
+          final imagePath = isSelected
+              ? (item.activeImagePath ?? item.imagePath)
+              : (item.inactiveImagePath ?? item.imagePath);
+          iconWidget = imagePath != null
+              ? Image.asset(
+                  imagePath,
+                  width: widget.iconSize,
+                  height: widget.iconSize,
+                  color: iconColor,
+                )
+              : const SizedBox.shrink();
+          break;
+        case LiquidIconType.iconData:
+          final iconData = isSelected
+              ? (widget.activeIcon?.call(item) ??
+                  item.activeIcon ??
+                  item.icon)
+              : (widget.inactiveIcon?.call(item) ??
+                  item.inactiveIcon ??
+                  item.icon);
+          iconWidget = Icon(
+            iconData,
+            size: widget.iconSize,
+            color: iconColor,
+          );
+          break;
+        case LiquidIconType.widget:
+          iconWidget = item.customWidget ?? const SizedBox.shrink();
+          break;
+      }
+
+      final itemConstraints = isVertical
+          ? BoxConstraints.tightFor(height: cellSize)
+          : BoxConstraints.tightFor(width: cellSize);
+
+      return ConstrainedBox(
+        key: ValueKey('nav_item_$index'),
+        constraints: itemConstraints,
+        child: GestureDetector(
+          onTap: () => _onTapItem(index),
+          behavior: HitTestBehavior.opaque,
+          child: _buildItemContent(
+            isVertical: isVertical,
+            isSelected: isSelected,
+            iconWidget: iconWidget,
+            index: index,
+            style: style,
+            item: item,
+          ),
+        ),
+      );
+    };
+
+    final onReorder = widget.onReorder;
+    if (onReorder != null) {
+      return ReorderableListView.builder(
+        scrollController: _scrollController,
+        padding: padding,
+        scrollDirection: widget.scrollDirection,
+        proxyDecorator: widget.proxyDecorator ??
+            (child, index, animation) => ScaleTransition(
+                  scale: animation.drive(Tween(begin: 1.0, end: 1.5)),
+                  child: child,
+                ),
+        itemCount: widget.items.length,
+        onReorder: onReorder,
+        onReorderStart: (_) => setState(() => _isReordering = true),
+        onReorderEnd: (_) => setState(() => _isReordering = false),
+        itemBuilder: itemBuilder,
+      );
+    }
+
+    return ListView.builder(
+      controller: _scrollController,
+      padding: padding,
+      itemCount: widget.items.length,
+      scrollDirection: widget.scrollDirection,
+      itemBuilder: itemBuilder,
+    );
   }
 
   Widget _buildItemContent({
