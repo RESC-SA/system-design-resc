@@ -12,7 +12,6 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_animate: ^4.5.2
-  full_svg_flutter: ^1.2.0
 
 dev_dependencies:
   flutter_test:

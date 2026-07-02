@@ -2,9 +2,6 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:full_svg_flutter/flutter_svg.dart';
-
-import '../../pkg-icons/widgets/svg_icon.dart';
 import '../../theme/theme_extensions.dart';
 import 'liquid_nav_item.dart';
 import 'liquid_nav_style.dart';
@@ -637,16 +634,16 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                         )
                                       : const SizedBox.shrink();
                                   break;
-                                case LiquidIconType.svg:
-                                  final svgPath = item.svgPath;
-                                  iconWidget = svgPath != null
-                                      ? SvgIcon(
-                                          assetName: svgPath,
-                                          size: widget.iconSize,
-                                          color: iconColor,
-                                        )
-                                      : const SizedBox.shrink();
-                                  break;
+                                // case LiquidIconType.svg:
+                                //   final svgPath = item.svgPath;
+                                //   iconWidget = svgPath != null
+                                //       ? SvgIcon( 
+                                //           assetName: svgPath,
+                                //           size: widget.iconSize,
+                                //           color: iconColor,
+                                //         )
+                                //       : const SizedBox.shrink();
+                                //   break;
                                 case LiquidIconType.iconData:
                                   final iconData = isSelected
                                       ? (widget.activeIcon?.call(item) ??
@@ -664,20 +661,20 @@ class _LiquidBottomNavBarState extends State<LiquidBottomNavBar>
                                 case LiquidIconType.widget:
                                   iconWidget = item.customWidget ?? const SizedBox.shrink();
                                   break;
-                                case LiquidIconType.svgx:
-                                  final svgxPath = item.svgxPath;
-                                  iconWidget = svgxPath != null
-                                      ? SvgPicture.asset(
-                                          svgxPath,
-                                          width: widget.iconSize,
-                                          height: widget.iconSize,
-                                          colorFilter: ColorFilter.mode(
-                                            iconColor ?? Colors.black,
-                                            BlendMode.srcIn,
-                                          ),
-                                        )
-                                      : const SizedBox.shrink();
-                                  break;
+                                // case LiquidIconType.svgx:
+                                //   final svgxPath = item.svgxPath;
+                                //   iconWidget = svgxPath != null
+                                //       ? SvgPicture.asset(
+                                //           svgxPath,
+                                //           width: widget.iconSize,
+                                //           height: widget.iconSize,
+                                //           colorFilter: ColorFilter.mode(
+                                //             iconColor ?? Colors.black,
+                                //             BlendMode.srcIn,
+                                //           ),
+                                //         )
+                                //       : const SizedBox.shrink();
+                                //   break;
                               }
 
                               return Expanded(

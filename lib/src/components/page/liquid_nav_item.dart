@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-enum LiquidIconType { iconData, image, svg, widget, svgx }
+enum LiquidIconType { iconData, image, widget }
 
 /// Model for a single navigation item.
 @immutable

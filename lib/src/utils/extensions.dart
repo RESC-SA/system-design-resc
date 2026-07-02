@@ -283,8 +283,8 @@ extension WidgetX on Widget {
   Widget get visible => this;
   Widget get hidden => this;
   Widget padDir(double v) => Padding(padding: EdgeInsetsDirectional.all(v), child: this);
-  Widget padDirOnly({double start = 0, double end = 0}) =>
-      Padding(padding: EdgeInsetsDirectional.only(start: start, end: end), child: this);
+  Widget padDirOnly({double start = 0, double end = 0, double top = 0, double bottom = 0}) =>
+      Padding(padding: EdgeInsetsDirectional.only(start: start, end: end, top: top, bottom: bottom), child: this);
   Widget padDirSym({double start = 0, double end = 0}) =>
       Padding(padding: EdgeInsetsDirectional.symmetric(horizontal: start, vertical: end), child: this);
 

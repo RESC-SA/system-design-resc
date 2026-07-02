@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_design_system/flutter_design_system.dart';
 
 class AppListTile extends StatelessWidget {
   final Widget? leading;
@@ -59,8 +61,23 @@ class AppListTile extends StatelessWidget {
   }
 }
 
-
 class AppListTileV2 extends StatelessWidget {
+  final Widget? leading;
+
+  final Widget? title;
+  final Widget? subtitle;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+  final bool? enabled;
+  final Color? backgroundColorContainer;
+  final double? borderRadiusNum;
+  final BorderRadius? borderRadius;
+  final BoxBorder? border;
+  final List<BoxShadow>? boxShadow;
+  final Offset? shadowOffset;
+  final Color? tileColor;
+  final EdgeInsetsGeometry? contentPadding;
+  final double? height, width;
   const AppListTileV2({
     super.key,
     this.leading,
@@ -81,22 +98,6 @@ class AppListTileV2 extends StatelessWidget {
     this.width,
   });
 
-  final Widget? leading;
-  final Widget? title;
-  final Widget? subtitle;
-  final Widget? trailing;
-  final VoidCallback? onTap;
-  final bool? enabled;
-  final Color? backgroundColorContainer;
-  final double? borderRadiusNum;
-  final BorderRadius? borderRadius;
-  final BoxBorder? border;
-  final List<BoxShadow>? boxShadow;
-  final Offset? shadowOffset;
-  final Color? tileColor;
-  final EdgeInsetsGeometry? contentPadding;
-  final double? height, width;
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -116,13 +117,74 @@ class AppListTileV2 extends StatelessWidget {
         trailing: trailing,
         onTap: onTap,
         enabled: enabled ?? true,
-        contentPadding: contentPadding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        contentPadding: contentPadding ??
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         style: ListTileStyle.list,
         shape: RoundedRectangleBorder(
           borderRadius:
               borderRadius ?? BorderRadius.circular(borderRadiusNum ?? 8),
         ),
         tileColor: tileColor ?? Colors.white,
+      ),
+    );
+  }
+}
+
+class AppListTileV3 extends StatelessWidget {
+  final String subtitle;
+  final double width, height;
+  final Color backgroundColorContainer;
+  final List<BoxShadow> boxShadow;
+  final BorderRadius borderRadius;
+  final Widget title;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+  final Color? tileColor;
+  final TextStyle? subtitleStyle;
+  final Widget? switchWidget;
+  const AppListTileV3(
+      {super.key,
+      required this.subtitle,
+      this.width = 100,
+      required this.height,
+      required this.backgroundColorContainer,
+      required this.boxShadow,
+      required this.borderRadius,
+      required this.title,
+      this.trailing,
+      this.onTap,
+      this.tileColor,
+      this.subtitleStyle, this.switchWidget
+      });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      width: width,
+      decoration: BoxDecoration(
+        boxShadow: boxShadow,
+        borderRadius: borderRadius,
+        color: backgroundColorContainer,
+      ),
+      child: ListTile(
+        //splashColor: context.themex.primary,
+        minTileHeight: 5,
+        //tileColor: context.liquidGlassTile.withValues(alpha: 0.5),
+        title: title,
+        subtitle: Text(
+          subtitle,
+          style: subtitleStyle,
+        ),
+        trailing: switchWidget,
+        // subtitle: Text(
+        //   subtitle,
+        //   style: TextStyle(
+        //     fontSize: 12,
+        //     fontWeight: FontWeight.bold,
+        //     color: colors.textPrimary,
+        //   ),
+        //),
       ),
     );
   }
